@@ -2,7 +2,6 @@
 using UnityEngine;
 
 public class GameBoard : MonoBehaviour {
-
     private Tile[] tiles;
     public int boardRows = 0;
     public int boardCols = 0;
@@ -10,7 +9,7 @@ public class GameBoard : MonoBehaviour {
 
     void Start () {
         tiles = new Tile[boardRows * boardCols];
-        for(int i=0; i < boardRows; ++i)
+        for(int i = 0 ; i < boardRows; ++i)
         {
             for(int j = 0; j < boardCols; ++j)
             {

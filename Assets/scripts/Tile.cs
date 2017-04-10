@@ -3,8 +3,8 @@
 public class Tile : MonoBehaviour {
     private Army occupantRed;
     private Army occupantBlue;
-    private bool contested = false;
     private GameManager gameManager;
+    private Army.Team controllingTeam = Army.Team.Neutral;
 
     private void Start()
     {
@@ -18,12 +18,7 @@ public class Tile : MonoBehaviour {
 
     public bool IsContested()
     {
-        return contested;
-    }
-
-    public void AddOccupant(Army army)
-    {
-        occupantRed = army;
+        return occupantBlue != null && occupantRed != null;
     }
 
     internal Army GetOccupant()
@@ -57,7 +52,6 @@ public class Tile : MonoBehaviour {
 
             if (occupantBlue != null && occupantRed != null)
             {
-                contested = true;
                 gameManager.AddContestedTile(this);
             }
         }
@@ -72,9 +66,6 @@ public class Tile : MonoBehaviour {
                 occupantRed = null;
             else
                 occupantBlue = null;
-
-            if (occupantBlue == null || occupantRed == null)
-                contested = false;
         }
     }
 }

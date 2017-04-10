@@ -8,11 +8,11 @@ public class GameManager : MonoBehaviour {
     Army selectedObject;
     List<Tile> contestedTiles = new List<Tile>();
     private int logicCounter;
-    private const int LOGIC_TICKS = 100;
+    private const int LOGIC_TICKS = 50;
 
-    // Use this for initialization
     void Start () {
         gameBoard = FindObjectOfType<GameBoard>();
+        // Copy scale and pos from gameBoard so that the GameManager collider covers the entire board
         transform.localScale = new Vector3(gameBoard.boardCols, gameBoard.boardRows);
         transform.position = new Vector3(gameBoard.boardCols / 2f, gameBoard.boardRows / 2f, -1);
 	}
@@ -50,7 +50,6 @@ public class GameManager : MonoBehaviour {
             if (defender.Alive())
             {
                 defender.Attack(attacker);
-
                 if (!attacker.Alive())
                 {
                     tilesPendingRemoval.Add(tile);
@@ -73,8 +72,7 @@ public class GameManager : MonoBehaviour {
 
     private void OnMouseDown()
     {
-       var tile =  gameBoard.GetTile(Input.mousePosition);
-
+        var tile = gameBoard.GetTile(Input.mousePosition);
         if (ObjectSelected())
         {
             MoveSelected(tile);

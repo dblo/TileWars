@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Army : MonoBehaviour {
     public enum Team { Red, Blue, Neutral };
@@ -9,6 +8,12 @@ public class Army : MonoBehaviour {
     public float range;
     private Transform nextWaypoint;
     public Team team;
+
+    private void Start()
+    {
+        attack = Random.Range(1, 6);
+        hp = Random.Range(10, 20);
+    }
 
     void FixedUpdate () {
 		if(nextWaypoint != null)
@@ -36,6 +41,7 @@ public class Army : MonoBehaviour {
     internal void Attack(Army enemy)
     {
         enemy.hp -= attack;
+        Debug.Log(team + " attacked: " + attack + "dmg. " + enemy.team + " hp: " + enemy.hp);
     }
 
     internal bool Alive()
