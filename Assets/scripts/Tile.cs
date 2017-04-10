@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class Tile : MonoBehaviour {
     private Army occupantRed;
@@ -50,10 +51,14 @@ public class Tile : MonoBehaviour {
             else
                 occupantBlue = army;
 
-            if (occupantBlue != null && occupantRed != null)
+            if (IsContested())
             {
                 gameManager.AddContestedTile(this);
                 army.EnteredContestedTile(new Vector3(-0.5f, -0.5f));
+            }
+            else
+            {
+                ChangeControllingTeam(army.team);
             }
         }
     }
@@ -69,6 +74,7 @@ public class Tile : MonoBehaviour {
                 if(occupantBlue)
                 {
                     occupantBlue.RemoveOffset();
+                    ChangeControllingTeam(Army.Team.Blue);
                 }
             }
             else
@@ -77,8 +83,24 @@ public class Tile : MonoBehaviour {
                 if(occupantRed)
                 {
                     occupantRed.RemoveOffset();
+                    ChangeControllingTeam(Army.Team.Red);
                 }
             }
         }
+    }
+
+    private void ChangeControllingTeam(Army.Team team)
+    {
+        controllingTeam = team;
+        var renderer = GetComponent<SpriteRenderer>();
+
+        if (controllingTeam == Army.Team.Red)
+            renderer.color = new Color(200, 0, 0);
+        else if (controllingTeam == Army.Team.Blue)
+            renderer.color = new Color(0, 0, 200);
+        else if (controllingTeam == Army.Team.Neutral)
+            renderer.color = new Color(255, 255, 255);
+        else
+            throw new ArgumentException();
     }
 }
