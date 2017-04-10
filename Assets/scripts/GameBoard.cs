@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using UnityEngine;
 
 public class GameBoard : MonoBehaviour {
@@ -36,5 +39,10 @@ public class GameBoard : MonoBehaviour {
         if (row < 0 || col < 0 || row >= boardRows || col >= boardCols)
             throw new ArgumentException();
         return tiles[row * boardCols + col];
+    }
+
+    public ReadOnlyCollection<Tile> GetTiles()
+    {
+        return Array.AsReadOnly(tiles);
     }
 }

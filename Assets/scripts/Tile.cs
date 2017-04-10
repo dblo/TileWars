@@ -6,6 +6,12 @@ public class Tile : MonoBehaviour {
     private Army occupantBlue;
     private GameManager gameManager;
     private Army.Team controllingTeam = Army.Team.Neutral;
+    //private int level = 1;
+
+    internal Army.Team ControlledBy()
+    {
+        return controllingTeam;
+    }
 
     private void Start()
     {
@@ -15,6 +21,16 @@ public class Tile : MonoBehaviour {
     internal bool IsOccupied()
     {
         return occupantRed != null || occupantBlue != null;
+    }
+
+    internal int GetScoreValue()
+    {
+        return 1;
+    }
+
+    internal int GetCashValue()
+    {
+        return 1;
     }
 
     public bool IsContested()
