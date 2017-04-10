@@ -1,28 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using UnityEngine;
 
 public class GameBoard : MonoBehaviour {
-    private Tile[] tiles;
-    public int boardRows = 0;
-    public int boardCols = 0;
-    public GameObject plainsPrefab;
+    private List<Tile> tiles;
+    [SerializeField]
+    private int boardRows;
+    [SerializeField]
+    private int boardCols;
+    [SerializeField]
+    private GameObject plainsPrefab;
 
     void Start () {
-        tiles = new Tile[boardRows * boardCols];
+        tiles = new List<Tile>(boardRows * boardCols);
         for(int i = 0 ; i < boardRows; ++i)
         {
             for(int j = 0; j < boardCols; ++j)
             {
                 var newTile = Instantiate(plainsPrefab, transform);
                 newTile.transform.position += new Vector3(j, i, 0);
-                tiles[i * boardCols + j] = newTile.GetComponent<Tile>();
+                tiles.Add(newTile.GetComponent<Tile>());
             }
         }
 	}
-	
+
+    internal int GetColsCount()
+    {
+        return boardCols;
+    }
+
+    internal int GetRowsCount()
+    {
+        return boardRows;
+    }
+
     public Tile GetTile(Vector2 screenCoordinate)
     {
         var worldCoordinate = Camera.main.ScreenToWorldPoint(screenCoordinate);
@@ -43,6 +55,6 @@ public class GameBoard : MonoBehaviour {
 
     public ReadOnlyCollection<Tile> GetTiles()
     {
-        return Array.AsReadOnly(tiles);
+        return tiles.AsReadOnly();
     }
 }

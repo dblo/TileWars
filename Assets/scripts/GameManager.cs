@@ -4,25 +4,26 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GameManager : MonoBehaviour {
-    GameBoard gameBoard;
-    Army selectedObject;
-    List<Tile> contestedTiles = new List<Tile>();
+public class GameManager : MonoBehaviour
+{
+    private GameBoard gameBoard;
+    private Army selectedObject;
+    private List<Tile> contestedTiles = new List<Tile>();
     private int logicCounter;
-    private const int LOGIC_TICKS = 50;
     private Text scoreText;
     private Text cashText;
-
     private int redCash;
     private int blueCash;
     private int redScore;
     private int blueScore;
+    private const int LOGIC_TICKS = 50;
 
-    void Start () {
+    void Start()
+    {
         gameBoard = FindObjectOfType<GameBoard>();
         // Copy scale and pos from gameBoard so that the GameManager collider covers the entire board
-        transform.localScale = new Vector3(gameBoard.boardCols, gameBoard.boardRows);
-        transform.position = new Vector3(gameBoard.boardCols / 2f, gameBoard.boardRows / 2f, -1);
+        transform.localScale = new Vector3(gameBoard.GetColsCount(), gameBoard.GetRowsCount());
+        transform.position = new Vector3(gameBoard.GetColsCount() / 2f, gameBoard.GetRowsCount() / 2f, -1);
         scoreText = GameObject.Find("ScoreText").GetComponent<Text>();
         cashText = GameObject.Find("CashText").GetComponent<Text>();
     }
@@ -34,7 +35,7 @@ public class GameManager : MonoBehaviour {
 
     private void FixedUpdate()
     {
-        if(logicCounter <= 0)
+        if (logicCounter <= 0)
         {
             logicCounter = LOGIC_TICKS;
             RunCombatLogic();
@@ -49,15 +50,15 @@ public class GameManager : MonoBehaviour {
     private void UpdateCashScore()
     {
         var tiles = gameBoard.GetTiles();
-        foreach(Tile tile in tiles)
+        foreach (Tile tile in tiles)
         {
             switch (tile.ControlledBy())
             {
-                case Army.Team.Red:
+                case Team.Red:
                     redCash += tile.GetCashValue();
                     redScore += tile.GetScoreValue();
                     break;
-                case Army.Team.Blue:
+                case Team.Blue:
                     blueCash += tile.GetCashValue();
                     blueScore += tile.GetScoreValue();
                     break;
@@ -138,10 +139,11 @@ public class GameManager : MonoBehaviour {
 
     private void MoveSelected(Tile tile)
     {
-        if(selectedObject != null)
+        if (selectedObject != null)
         {
             var army = selectedObject.GetComponent<Army>();
-            if(army != null){
+            if (army != null)
+            {
                 army.MoveTo(tile);
             }
         }

@@ -5,10 +5,10 @@ public class Tile : MonoBehaviour {
     private Army occupantRed;
     private Army occupantBlue;
     private GameManager gameManager;
-    private Army.Team controllingTeam = Army.Team.Neutral;
+    private Team controllingTeam = Team.Neutral;
     //private int level = 1;
 
-    internal Army.Team ControlledBy()
+    internal Team ControlledBy()
     {
         return controllingTeam;
     }
@@ -62,7 +62,7 @@ public class Tile : MonoBehaviour {
         var army = collision.GetComponent<Army>();
         if(army)
         {
-            if (army.GetTeam() == Army.Team.Red)
+            if (army.GetTeam() == Team.Red)
                 occupantRed = army;
             else
                 occupantBlue = army;
@@ -74,7 +74,7 @@ public class Tile : MonoBehaviour {
             }
             else
             {
-                ChangeControllingTeam(army.team);
+                ChangeControllingTeam(army.GetTeam());
             }
         }
     }
@@ -84,13 +84,13 @@ public class Tile : MonoBehaviour {
         var army = collision.GetComponent<Army>();
         if (army)
         {
-            if (army.GetTeam() == Army.Team.Red)
+            if (army.GetTeam() == Team.Red)
             {
                 occupantRed = null;
                 if(occupantBlue)
                 {
                     occupantBlue.RemoveOffset();
-                    ChangeControllingTeam(Army.Team.Blue);
+                    ChangeControllingTeam(Team.Blue);
                 }
             }
             else
@@ -99,22 +99,22 @@ public class Tile : MonoBehaviour {
                 if(occupantRed)
                 {
                     occupantRed.RemoveOffset();
-                    ChangeControllingTeam(Army.Team.Red);
+                    ChangeControllingTeam(Team.Red);
                 }
             }
         }
     }
 
-    private void ChangeControllingTeam(Army.Team team)
+    private void ChangeControllingTeam(Team team)
     {
         controllingTeam = team;
         var renderer = GetComponent<SpriteRenderer>();
 
-        if (controllingTeam == Army.Team.Red)
+        if (controllingTeam == Team.Red)
             renderer.color = new Color(200, 0, 0);
-        else if (controllingTeam == Army.Team.Blue)
+        else if (controllingTeam == Team.Blue)
             renderer.color = new Color(0, 0, 200);
-        else if (controllingTeam == Army.Team.Neutral)
+        else if (controllingTeam == Team.Neutral)
             renderer.color = new Color(255, 255, 255);
         else
             throw new ArgumentException();

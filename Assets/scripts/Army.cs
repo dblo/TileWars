@@ -2,16 +2,21 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum Team { Red, Blue, Neutral };
+
 public class Army : MonoBehaviour {
-    public enum Team { Red, Blue, Neutral };
-    public int attack;
-    public float speed;
-    public int hp;
-    public float range;
+    [SerializeField]
+    private int attack;
+    [SerializeField]
+    private float speed;
+    [SerializeField]
+    private int hp;
+    [SerializeField]
+    private float range;
+    [SerializeField]
+    private Team team;
     private Transform nextWaypoint;
-    public Team team;
-    Text textPlate;
-    private string level = "1";
+    private Text textPlate;
     private Vector3 origin = new Vector3();
     private Vector3 waypointOffset;
 
@@ -52,7 +57,7 @@ public class Army : MonoBehaviour {
     internal void Attack(Army enemy)
     {
         enemy.TakeDamage(attack);
-        Debug.Log(team + " attacked: " + attack + "dmg. " + enemy.team + " hp: " + enemy.hp);
+        //Debug.Log(team + " attacked: " + attack + "dmg. " + enemy.team + " hp: " + enemy.hp);
     }
 
     private void TakeDamage(int damage)
@@ -68,7 +73,7 @@ public class Army : MonoBehaviour {
 
     private void UpdateText()
     {
-        textPlate.text = level.ToString() + " - " + hp.ToString();
+        textPlate.text = hp.ToString();
     }
 
     internal bool Alive()
