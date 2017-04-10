@@ -53,6 +53,7 @@ public class Tile : MonoBehaviour {
             if (occupantBlue != null && occupantRed != null)
             {
                 gameManager.AddContestedTile(this);
+                army.EnteredContestedTile(new Vector3(-0.5f, -0.5f));
             }
         }
     }
@@ -63,9 +64,21 @@ public class Tile : MonoBehaviour {
         if (army)
         {
             if (army.GetTeam() == Army.Team.Red)
+            {
                 occupantRed = null;
+                if(occupantBlue)
+                {
+                    occupantBlue.RemoveOffset();
+                }
+            }
             else
+            {
                 occupantBlue = null;
+                if(occupantRed)
+                {
+                    occupantRed.RemoveOffset();
+                }
+            }
         }
     }
 }
