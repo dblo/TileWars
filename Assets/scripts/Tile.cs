@@ -71,6 +71,9 @@ public class Tile : MonoBehaviour {
             {
                 gameManager.AddContestedTile(this);
                 army.EnteredContestedTile(new Vector3(-0.5f, -0.5f));
+
+                occupantBlue.StopAndFight();
+                occupantRed.StopAndFight();
             }
             else
             {

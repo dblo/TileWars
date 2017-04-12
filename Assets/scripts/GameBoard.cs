@@ -46,7 +46,7 @@ public class GameBoard : MonoBehaviour {
         return GetTile((int)row, (int)col);
     }
 
-    private Tile GetTile(int row, int col)
+    public Tile GetTile(int row, int col)
     {
         if (row < 0 || col < 0 || row >= boardRows || col >= boardCols)
             throw new ArgumentException();

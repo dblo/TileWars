@@ -88,7 +88,7 @@ public class GameManager : MonoBehaviour
         {
             var attacker = tile.GetAttacker();
             var defender = tile.GetDefender();
-
+            
             attacker.Attack(defender);
             if (defender.Alive())
             {

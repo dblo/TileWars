@@ -15,38 +15,56 @@ public class Army : MonoBehaviour {
     private float range;
     [SerializeField]
     private Team team;
-    private Transform nextWaypoint;
+    [SerializeField]
+    bool randomizeStats;
+    private Vector2 nextWaypoint;
     private Text textPlate;
-    private Vector3 origin = new Vector3();
-    private Vector3 waypointOffset;
+    private Vector2 invalid = new Vector2(-1, -1);
+    private Vector2 waypointOffset;
+    private bool inCombat;
 
     private void Start()
     {
-        attack = UnityEngine.Random.Range(1, 6);
-        hp = UnityEngine.Random.Range(10, 20);
-        waypointOffset = origin;
+        waypointOffset = Vector2.zero;
         textPlate = GetComponentInChildren<Text>();
+        nextWaypoint = invalid;
+
+        if (randomizeStats)
+        {
+            attack = UnityEngine.Random.Range(1, 6);
+            hp = UnityEngine.Random.Range(1, 15);
+        }
 
         // Post-init
         UpdateText();
     }
 
+    internal bool IsStationary()
+    {
+        return nextWaypoint == invalid;
+    }
+
+    internal bool IsInCombat()
+    {
+        return inCombat;
+    }
+
     void FixedUpdate () {
-		if(nextWaypoint != null)
+		if(nextWaypoint != invalid)
         {
-            var newPos = Vector2.MoveTowards(transform.position, nextWaypoint.position + waypointOffset, speed);
+            var newPos = Vector2.MoveTowards(transform.position, nextWaypoint + waypointOffset, speed);
             transform.position = newPos;
 
-            if (Vector2.Distance(transform.position, nextWaypoint.position) < .005)
+            if (Vector2.Distance(transform.position, nextWaypoint) < .005)
             {
-                nextWaypoint = null;
+                nextWaypoint = invalid;
             }
         }
 	}
 
     internal void MoveTo(Tile tile)
     {
-        nextWaypoint = tile.transform;
+        nextWaypoint = tile.transform.position;
     }
 
     internal Team GetTeam()
@@ -66,7 +84,7 @@ public class Army : MonoBehaviour {
         UpdateText();
     }
 
-    internal void EnteredContestedTile(Vector3 offset)
+    internal void EnteredContestedTile(Vector2 offset)
     {
         waypointOffset = offset;
     }
@@ -84,10 +102,13 @@ public class Army : MonoBehaviour {
     internal void RemoveOffset()
     {
         // Move to center of curr tile to negate offset
-        if(waypointOffset != origin)
-        {
-            nextWaypoint.position = transform.position - waypointOffset;
-            waypointOffset = origin;
-        }
+        nextWaypoint = (Vector2) transform.position - waypointOffset;
+        waypointOffset = Vector2.zero;
+    }
+
+    internal void StopAndFight()
+    {
+        nextWaypoint = invalid;
+        inCombat = true;
     }
 }
