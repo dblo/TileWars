@@ -7,38 +7,27 @@ public enum Team { Red, Blue, Neutral };
 
 public class Army : MonoBehaviour {
     [SerializeField]
-    private int attack;
-    [SerializeField]
-    private float speed;
-    [SerializeField]
-    private int hp;
-    [SerializeField]
-    private float range;
-    [SerializeField]
     private Team team;
     [SerializeField]
     bool randomizeStats;
     private Vector2 nextWaypoint;
-    private Text textPlate;
+    private Text powerText;
     private Vector2 invalidPos = new Vector2(-1, -1);
     private bool inCombat;
     private GameManager gameManager;
     private List<Army> enemiesInRange = new List<Army>();
+    private CombatUnit combatUnit = new CombatUnit();
 
     private void Awake()
     {
         gameManager = FindObjectOfType<GameManager>();
-
         if (randomizeStats)
-        {
-            attack = UnityEngine.Random.Range(1, 6);
-            hp = UnityEngine.Random.Range(1, 15);
-        }
+            combatUnit.RandomizeStats();
     }
 
     private void Start()
     {
-        textPlate = GetComponentInChildren<Text>();
+        powerText = GetComponentInChildren<Text>();
         nextWaypoint = invalidPos;
         // Post-init
         UpdateText();
@@ -68,7 +57,7 @@ public class Army : MonoBehaviour {
     void FixedUpdate () {
 		if(nextWaypoint != invalidPos)
         {
-            var newPos = Vector2.MoveTowards(transform.position, nextWaypoint, speed);
+            var newPos = Vector2.MoveTowards(transform.position, nextWaypoint, combatUnit.GetSpeed());
             transform.position = newPos;
             if (Vector2.Distance(transform.position, nextWaypoint) < .005)
             {
@@ -111,24 +100,19 @@ public class Army : MonoBehaviour {
 
     private void Attack(Army enemy)
     {
-        enemy.TakeDamage(attack);
+        enemy.combatUnit.TakeDamage(combatUnit);
+        enemy.UpdateText();
         //Debug.Log(team + " attacked: " + attack + "dmg. " + enemy.team + " hp: " + enemy.hp);
     }
-
-    private void TakeDamage(int damage)
-    {
-        hp -= damage;
-        UpdateText();
-    }
-
+    
     private void UpdateText()
     {
-        textPlate.text = hp.ToString();
+        powerText.text = combatUnit.GetPower();
     }
 
     internal bool IsAlive()
     {
-        return hp > 0;
+        return combatUnit.IsAlive();
     }
 
     internal void Stop()
@@ -149,7 +133,7 @@ public class Army : MonoBehaviour {
             Stop();
             return;
         }
-        if (collision.gameObject.name == "Wall(Clone)")
+        if (collision.gameObject.name == "Wall(Clone)") // TODO improve
         {
             Stop();
         }
