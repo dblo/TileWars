@@ -25,7 +25,7 @@ public class AIPlayer : Player {
     {
         for (int i = 0; i < maxArmyCount - armies.Count; i++)
         {
-            SpawnArmy();
+            SpawnArmy(hq.GetSpawnPoint());
         }
     }
 

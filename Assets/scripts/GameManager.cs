@@ -10,16 +10,9 @@ public class GameManager : MonoBehaviour
     private Army selectedArmy;
     private List<Tile> contestedTiles = new List<Tile>();
     private int logicCounter;
-    private Text scoreText;
-    private Text cashText;
-    private int redCash;
-    private int blueCash;
-    private int redScore;
-    private int blueScore;
     private const int LOGIC_TICKS = 50;
-
-    Player bluePlayer;
-    Player redPlayer;
+    Player p1;
+    Player p2;
 
     void Start()
     {
@@ -27,10 +20,11 @@ public class GameManager : MonoBehaviour
         // Copy scale and pos from gameBoard so that the GameManager collider covers the entire board
         transform.localScale = new Vector3(gameBoard.GetColsCount(), gameBoard.GetRowsCount());
         transform.position = new Vector3(gameBoard.GetColsCount() / 2f, gameBoard.GetRowsCount() / 2f, -1);
-        scoreText = GameObject.Find("ScoreText").GetComponent<Text>();
-        cashText = GameObject.Find("CashText").GetComponent<Text>();
-        bluePlayer = GameObject.Find("Player").GetComponent<Player>();
-        redPlayer = GameObject.Find("AIPlayer").GetComponent<Player>();
+        p1 = GameObject.Find("Player").GetComponent<Player>();
+
+        var p2GO = GameObject.Find("AIPlayer");
+        if(p2GO != null)
+            p2 = p2GO.GetComponent<Player>();
     }
 
     //public void AddContestedTile(Tile tile)
@@ -44,10 +38,10 @@ public class GameManager : MonoBehaviour
         {
             logicCounter = LOGIC_TICKS;
 
-            if(redPlayer && bluePlayer)
+            if(p2 && p1)
             {
                 RunCombatLogic();
-               UpdateCashScore();
+                UpdateCashScore();
             }
         }
         else
@@ -64,27 +58,17 @@ public class GameManager : MonoBehaviour
             switch (tile.ControlledBy())
             {
                 case Team.Red:
-                    redCash += tile.GetCashValue();
-                    redScore += tile.GetScoreValue();
+                    p2.AddCash(tile.GetCashValue());
+                    p2.AddScore(tile.GetScoreValue());
                     break;
                 case Team.Blue:
-                    blueCash += tile.GetCashValue();
-                    blueScore += tile.GetScoreValue();
+                    p1.AddCash(tile.GetCashValue());
+                    p1.AddScore(tile.GetScoreValue());
                     break;
             }
         }
-        UpdateCashText();
-        UpdateScoreText();
-    }
-
-    private void UpdateScoreText()
-    {
-        scoreText.text = "$R:B " + redScore + ":" + blueScore;
-    }
-
-    private void UpdateCashText()
-    {
-        cashText.text = "!R:B " + redCash + ":" + blueCash;
+        p1.UpdateUI();
+        p2.UpdateUI();
     }
 
     private void RunCombatLogic()
@@ -92,14 +76,14 @@ public class GameManager : MonoBehaviour
         //if (contestedTiles.Count == 0)
         //    return;
                 
-        foreach (var army in redPlayer.GetArmies())
+        foreach (var army in p2.GetArmies())
         {
             if(army.IsInCombat())
             {
                 army.DoCombat();
             }
         }
-        foreach (var army in bluePlayer.GetArmies())
+        foreach (var army in p1.GetArmies())
         {
             if (army.IsInCombat())
             {
@@ -108,7 +92,7 @@ public class GameManager : MonoBehaviour
         }
 
         List<Army> armiesPendingRemoval = new List<Army>();
-        foreach (var army in redPlayer.GetArmies())
+        foreach (var army in p2.GetArmies())
         {
             if (!army.IsAlive())
             {
@@ -116,17 +100,17 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        redPlayer.KillArmy(armiesPendingRemoval);
+        p2.KillArmy(armiesPendingRemoval);
         armiesPendingRemoval.Clear();
 
-        foreach (var army in bluePlayer.GetArmies())
+        foreach (var army in p1.GetArmies())
         {
             if (!army.IsAlive())
             {
                 armiesPendingRemoval.Add(army);
             }
         }
-        bluePlayer.KillArmy(armiesPendingRemoval);
+        p1.KillArmy(armiesPendingRemoval);
     }
 
     internal void OnArmyClicked(Army army)
