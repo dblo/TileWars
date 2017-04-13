@@ -43,8 +43,12 @@ public class GameManager : MonoBehaviour
         if (logicCounter <= 0)
         {
             logicCounter = LOGIC_TICKS;
-            RunCombatLogic();
-            UpdateCashScore();
+
+            if(redPlayer && bluePlayer)
+            {
+                RunCombatLogic();
+               UpdateCashScore();
+            }
         }
         else
         {

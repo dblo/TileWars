@@ -11,6 +11,8 @@ public class GameBoard : MonoBehaviour {
     private int boardCols;
     [SerializeField]
     private GameObject plainsPrefab;
+    [SerializeField]
+    private GameObject wallPrefab;
 
     void Start () {
         tiles = new List<Tile>(boardRows * boardCols);
@@ -23,7 +25,22 @@ public class GameBoard : MonoBehaviour {
                 tiles.Add(newTile.GetComponent<Tile>());
             }
         }
-	}
+        var leftWall = Instantiate(wallPrefab, transform);
+        leftWall.transform.localScale = new Vector3(1, boardRows);
+        leftWall.transform.position = transform.position + new Vector3(-1f, 2.5f);
+
+        var rightWall = Instantiate(wallPrefab, transform);
+        rightWall.transform.localScale = new Vector3(1, boardRows);
+        rightWall.transform.position += new Vector3(boardCols, 2.5f);
+
+        var upperWall = Instantiate(wallPrefab, transform);
+        upperWall.transform.position += new Vector3(-0.5f + boardCols / 2f, boardRows);
+        upperWall.transform.localScale = new Vector3(boardCols + 2, 1);
+
+        var lowerWall = Instantiate(wallPrefab, transform);
+        lowerWall.transform.position += new Vector3(-0.5f + boardCols / 2f, -1);
+        lowerWall.transform.localScale = new Vector3(boardCols + 2, 1);
+    }
 
     internal int GetColsCount()
     {

@@ -147,6 +147,11 @@ public class Army : MonoBehaviour {
         if(army != null && IsEnemy(army))
         {
             Stop();
+            return;
+        }
+        if (collision.gameObject.name == "Wall(Clone)")
+        {
+            Stop();
         }
     }
 
