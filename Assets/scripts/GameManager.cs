@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {
     private GameBoard gameBoard;
-    private Army selectedObject;
+    private Army selectedArmy;
     private List<Tile> contestedTiles = new List<Tile>();
     private int logicCounter;
     private Text scoreText;
@@ -18,6 +18,9 @@ public class GameManager : MonoBehaviour
     private int blueScore;
     private const int LOGIC_TICKS = 50;
 
+    Player bluePlayer;
+    Player redPlayer;
+
     void Start()
     {
         gameBoard = FindObjectOfType<GameBoard>();
@@ -26,12 +29,14 @@ public class GameManager : MonoBehaviour
         transform.position = new Vector3(gameBoard.GetColsCount() / 2f, gameBoard.GetRowsCount() / 2f, -1);
         scoreText = GameObject.Find("ScoreText").GetComponent<Text>();
         cashText = GameObject.Find("CashText").GetComponent<Text>();
+        bluePlayer = GameObject.Find("Player").GetComponent<Player>();
+        redPlayer = GameObject.Find("AIPlayer").GetComponent<Player>();
     }
 
-    public void AddContestedTile(Tile tile)
-    {
-        contestedTiles.Add(tile);
-    }
+    //public void AddContestedTile(Tile tile)
+    //{
+    //    contestedTiles.Add(tile);
+    //}
 
     private void FixedUpdate()
     {
@@ -80,72 +85,70 @@ public class GameManager : MonoBehaviour
 
     private void RunCombatLogic()
     {
-        if (contestedTiles.Count == 0)
-            return;
-
-        List<Tile> tilesPendingRemoval = new List<Tile>();
-        foreach (Tile tile in contestedTiles)
+        //if (contestedTiles.Count == 0)
+        //    return;
+                
+        foreach (var army in redPlayer.GetArmies())
         {
-            var attacker = tile.GetAttacker();
-            var defender = tile.GetDefender();
-            
-            attacker.Attack(defender);
-            if (defender.Alive())
+            if(army.IsInCombat())
             {
-                defender.Attack(attacker);
-                if (!attacker.Alive())
-                {
-                    tilesPendingRemoval.Add(tile);
-                    KillArmy(attacker);
-                }
-            }
-            else
-            {
-                tilesPendingRemoval.Add(tile);
-                KillArmy(defender);
+                army.DoCombat();
             }
         }
-        contestedTiles = contestedTiles.Except(tilesPendingRemoval).ToList();
-    }
-
-    private void KillArmy(Army army)
-    {
-        Destroy(army.gameObject);
-    }
-
-    private void OnMouseDown()
-    {
-        var tile = gameBoard.GetTile(Input.mousePosition);
-        if (ObjectSelected())
+        foreach (var army in bluePlayer.GetArmies())
         {
-            MoveSelected(tile);
+            if (army.IsInCombat())
+            {
+                army.DoCombat();
+            }
+        }
+
+        List<Army> armiesPendingRemoval = new List<Army>();
+        foreach (var army in redPlayer.GetArmies())
+        {
+            if (!army.IsAlive())
+            {
+                armiesPendingRemoval.Add(army);
+            }
+        }
+
+        redPlayer.KillArmy(armiesPendingRemoval);
+        armiesPendingRemoval.Clear();
+
+        foreach (var army in bluePlayer.GetArmies())
+        {
+            if (!army.IsAlive())
+            {
+                armiesPendingRemoval.Add(army);
+            }
+        }
+        bluePlayer.KillArmy(armiesPendingRemoval);
+    }
+
+    internal void OnArmyClicked(Army army)
+    {
+        selectedArmy = army;
+    }
+
+    internal void OnTileClicked(Tile tile)
+    {
+        if (selectedArmy != null)
+        {
+            var worldCoord = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            selectedArmy.MoveTo(worldCoord);
+            selectedArmy = null;
+        }
+        else
             ClearSelection();
-        }
-        else if (tile.IsOccupied())
-        {
-            selectedObject = tile.GetOccupant();
-        }
     }
 
     private void ClearSelection()
     {
-        selectedObject = null;
+        selectedArmy = null;
     }
 
-    private bool ObjectSelected()
-    {
-        return selectedObject != null;
-    }
-
-    private void MoveSelected(Tile tile)
-    {
-        if (selectedObject != null)
-        {
-            var army = selectedObject.GetComponent<Army>();
-            if (army != null)
-            {
-                army.MoveTo(tile);
-            }
-        }
-    }
+    //private bool ObjectSelected()
+    //{
+    //    return selectedArmy != null;
+    //}
 }

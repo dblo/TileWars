@@ -1,26 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Tile : MonoBehaviour {
-    private Army occupantRed;
-    private Army occupantBlue;
+    private List<Army> redOccupants = new List<Army>();
+    private List<Army> blueOccupants = new List<Army>();
     private GameManager gameManager;
     private Team controllingTeam = Team.Neutral;
-    //private int level = 1;
 
-    internal Team ControlledBy()
-    {
-        return controllingTeam;
-    }
-
-    private void Start()
+    private void Awake()
     {
         gameManager = FindObjectOfType<GameManager>();
-    }
-
-    internal bool IsOccupied()
-    {
-        return occupantRed != null || occupantBlue != null;
     }
 
     internal int GetScoreValue()
@@ -35,26 +25,12 @@ public class Tile : MonoBehaviour {
 
     public bool IsContested()
     {
-        return occupantBlue != null && occupantRed != null;
+        return redOccupants.Count > 0 && blueOccupants.Count > 0;
     }
 
-    internal Army GetOccupant()
+    internal Team ControlledBy()
     {
-        if (occupantRed != null)
-            return occupantRed;
-        else if (occupantBlue != null)
-            return occupantBlue;
-        return null;
-    }
-
-    public Army GetDefender()
-    {
-        return occupantRed;
-    }
-
-    public Army GetAttacker()
-    {
-        return occupantBlue;
+        return controllingTeam;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -63,17 +39,13 @@ public class Tile : MonoBehaviour {
         if(army)
         {
             if (army.GetTeam() == Team.Red)
-                occupantRed = army;
+                redOccupants.Add(army);
             else
-                occupantBlue = army;
+                blueOccupants.Add(army);
 
             if (IsContested())
             {
-                gameManager.AddContestedTile(this);
-                army.EnteredContestedTile(new Vector3(-0.5f, -0.5f));
-
-                occupantBlue.StopAndFight();
-                occupantRed.StopAndFight();
+                //gameManager.AddContestedTile(this);
             }
             else
             {
@@ -89,23 +61,26 @@ public class Tile : MonoBehaviour {
         {
             if (army.GetTeam() == Team.Red)
             {
-                occupantRed = null;
-                if(occupantBlue)
+                redOccupants.Remove(army);
+                if(blueOccupants.Count > 0)
                 {
-                    occupantBlue.RemoveOffset();
                     ChangeControllingTeam(Team.Blue);
                 }
             }
             else
             {
-                occupantBlue = null;
-                if(occupantRed)
+                blueOccupants.Remove(army);
+                if(redOccupants.Count > 0)
                 {
-                    occupantRed.RemoveOffset();
                     ChangeControllingTeam(Team.Red);
                 }
             }
         }
+    }
+
+    private void OnMouseDown()
+    {
+        gameManager.OnTileClicked(this);
     }
 
     private void ChangeControllingTeam(Team team)

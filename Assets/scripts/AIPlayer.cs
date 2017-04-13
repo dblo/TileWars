@@ -1,19 +1,14 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class AIPlayer : MonoBehaviour {
-    public int maxArmyCount;
-    public Vector2 spawnpoint;
-    private List<Army> armies;
+public class AIPlayer : Player {
 	private int logicCounter;
     private GameBoard gameBoard;
-    public GameObject armyPrefab;
 
-    private void Start()
+    override protected void Start()
     {
+        base.Start();
         gameBoard = FindObjectOfType<GameBoard>();
-        armies = new List<Army>(maxArmyCount);
-        SpawnArmies();
     }
 
     void Update () {
@@ -22,32 +17,23 @@ public class AIPlayer : MonoBehaviour {
         {
             logicCounter = 50;
             RespawnnDeadArmies();
-            MoveArmies(false);
-        }
-    }
-
-    private void SpawnArmies()
-    {
-        for (int i = 0; i < maxArmyCount; i++)
-        {
-            armies.Add(Instantiate(armyPrefab, transform).GetComponent<Army>());
+            MoveArmies();
         }
     }
 
     private void RespawnnDeadArmies()
     {
-        for (int i = 0; i < maxArmyCount; i++)
+        for (int i = 0; i < maxArmyCount - armies.Count; i++)
         {
-            if (armies[i] == null)
-                armies[i] = Instantiate(armyPrefab, transform).GetComponent<Army>();
+            SpawnArmy();
         }
     }
 
-    private void MoveArmies(bool forceMove)
+    private void MoveArmies()
     {
         foreach (var army in armies)
         {
-            if (army != null && !army.IsInCombat() && (army.IsStationary() || forceMove))
+            if (army != null && !army.IsInCombat() && army.IsStationary())
             {
                 var col = Random.Range(0, gameBoard.GetColsCount()-1);
                 var row = Random.Range(0, gameBoard.GetRowsCount()-1);

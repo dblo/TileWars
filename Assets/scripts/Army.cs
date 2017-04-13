@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -19,29 +20,44 @@ public class Army : MonoBehaviour {
     bool randomizeStats;
     private Vector2 nextWaypoint;
     private Text textPlate;
-    private Vector2 invalid = new Vector2(-1, -1);
-    private Vector2 waypointOffset;
+    private Vector2 invalidPos = new Vector2(-1, -1);
     private bool inCombat;
+    private GameManager gameManager;
+    private List<Army> enemiesInRange = new List<Army>();
 
-    private void Start()
+    private void Awake()
     {
-        waypointOffset = Vector2.zero;
-        textPlate = GetComponentInChildren<Text>();
-        nextWaypoint = invalid;
+        gameManager = FindObjectOfType<GameManager>();
 
         if (randomizeStats)
         {
             attack = UnityEngine.Random.Range(1, 6);
             hp = UnityEngine.Random.Range(1, 15);
         }
+    }
 
+    private void Start()
+    {
+        textPlate = GetComponentInChildren<Text>();
+        nextWaypoint = invalidPos;
         // Post-init
         UpdateText();
     }
 
+    internal void OnEnemyInRange(Army enemy)
+    {
+        enemiesInRange.Add(enemy);
+        inCombat = true;
+    }
+
+    internal bool IsEnemy(Army other)
+    {
+        return team != other.team;
+    }
+
     internal bool IsStationary()
     {
-        return nextWaypoint == invalid;
+        return nextWaypoint == invalidPos;
     }
 
     internal bool IsInCombat()
@@ -50,21 +66,34 @@ public class Army : MonoBehaviour {
     }
 
     void FixedUpdate () {
-		if(nextWaypoint != invalid)
+		if(nextWaypoint != invalidPos)
         {
-            var newPos = Vector2.MoveTowards(transform.position, nextWaypoint + waypointOffset, speed);
+            var newPos = Vector2.MoveTowards(transform.position, nextWaypoint, speed);
             transform.position = newPos;
-
             if (Vector2.Distance(transform.position, nextWaypoint) < .005)
             {
-                nextWaypoint = invalid;
+                nextWaypoint = invalidPos;
             }
         }
 	}
 
+    internal void OnEnemyOutOfRange(Army army)
+    {
+        enemiesInRange.Remove(army);
+        if (enemiesInRange.Count == 0)
+        {
+            inCombat = false;
+        }
+    }
+
     internal void MoveTo(Tile tile)
     {
         nextWaypoint = tile.transform.position;
+    }
+
+    internal void MoveTo(Vector3 worldCoord)
+    {
+        nextWaypoint = worldCoord;
     }
 
     internal Team GetTeam()
@@ -72,7 +101,15 @@ public class Army : MonoBehaviour {
         return team;
     }
 
-    internal void Attack(Army enemy)
+    internal void DoCombat()
+    {
+        if(enemiesInRange.Count > 0)
+        {
+            Attack(enemiesInRange[0]);
+        }
+    }
+
+    private void Attack(Army enemy)
     {
         enemy.TakeDamage(attack);
         //Debug.Log(team + " attacked: " + attack + "dmg. " + enemy.team + " hp: " + enemy.hp);
@@ -84,31 +121,41 @@ public class Army : MonoBehaviour {
         UpdateText();
     }
 
-    internal void EnteredContestedTile(Vector2 offset)
-    {
-        waypointOffset = offset;
-    }
-
     private void UpdateText()
     {
         textPlate.text = hp.ToString();
     }
 
-    internal bool Alive()
+    internal bool IsAlive()
     {
         return hp > 0;
     }
 
-    internal void RemoveOffset()
+    internal void Stop()
     {
-        // Move to center of curr tile to negate offset
-        nextWaypoint = (Vector2) transform.position - waypointOffset;
-        waypointOffset = Vector2.zero;
+        nextWaypoint = invalidPos;
     }
 
-    internal void StopAndFight()
+    private void OnMouseDown()
     {
-        nextWaypoint = invalid;
-        inCombat = true;
+        gameManager.OnArmyClicked(this);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        var army = collision.GetComponent<Army>();
+        if(army != null && IsEnemy(army))
+        {
+            Stop();
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        var army = collision.GetComponent<Army>();
+        if (army != null && IsEnemy(army))
+        {
+            OnEnemyOutOfRange(army);
+        }
     }
 }
