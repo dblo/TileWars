@@ -35,9 +35,10 @@ public class Tile : MonoBehaviour {
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        var army = collision.GetComponent<Army>();
-        if(army)
+        var armyRange = collision.GetComponent<ArmyRangeManager>();
+        if(armyRange)
         {
+            var army = armyRange.GetArmy();
             if (army.GetTeam() == Team.Red)
                 redOccupants.Add(army);
             else
@@ -56,9 +57,10 @@ public class Tile : MonoBehaviour {
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        var army = collision.GetComponent<Army>();
-        if (army)
+        var armyRange = collision.GetComponent<ArmyRangeManager>();
+        if (armyRange)
         {
+            var army = armyRange.GetArmy();
             if (army.GetTeam() == Team.Red)
             {
                 redOccupants.Remove(army);

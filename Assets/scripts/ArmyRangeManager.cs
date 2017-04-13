@@ -6,9 +6,14 @@ public class ArmyRangeManager : MonoBehaviour {
     private Army parent;
 
 	// Use this for initialization
-	void Start () {
+	void Awake () {
         parent = transform.parent.GetComponent<Army>();
 	}
+
+    internal Army GetArmy()
+    {
+        return parent;
+    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
