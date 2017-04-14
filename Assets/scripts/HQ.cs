@@ -1,12 +1,11 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-public enum Direction { N, W, S, E };
-
 public class HQ : MonoBehaviour
 {
     private Text cashText;
     private Player player;
+    private bool buying;
 
     void Awake()
     {
@@ -24,8 +23,24 @@ public class HQ : MonoBehaviour
         return transform.position;
     }
 
+    private void HandleMouseInteraction()
+    {
+        if (Input.GetMouseButton(1) && buying)
+        {
+            player.AttemptBuyArmy(ArmyType.Artillery);
+        }
+        else if (Input.GetMouseButton(0) && buying)
+        {
+            player.AttemptBuyArmy(ArmyType.Infantry);
+        }
+    }
+
     private void OnMouseDown()
     {
-        player.AttemptBuyArmy(Direction.S);
+        if (buying)
+        {
+            HandleMouseInteraction();
+        }
+        buying = !buying;
     }
 }

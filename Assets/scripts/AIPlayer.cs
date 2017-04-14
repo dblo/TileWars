@@ -25,8 +25,30 @@ public class AIPlayer : Player {
     {
         for (int i = 0; i < maxArmyCount - armies.Count; i++)
         {
-            SpawnArmy(hq.GetSpawnPoint());
+            SpawnArmy(hq.GetSpawnPoint(), GetRandomArmyPrefab());
         }
+    }
+
+    protected GameObject GetRandomArmyPrefab()
+    {
+        if (Random.Range(0, 2) == 0)
+            return infantryPrefab;
+        else
+            return artilleryPrefab;
+    }
+
+    protected override void SpawnArmies()
+    {
+        for (int i = 0; i < maxArmyCount; i++)
+        {
+            SpawnArmy(hq.GetSpawnPoint(), GetRandomArmyPrefab());
+        }
+    }
+
+    protected override void SpawnArmy(Vector2 spawnPoint, GameObject prefab)
+    {
+        base.SpawnArmy(spawnPoint, prefab);
+        armies[armies.Count - 1].RandomizeStats();
     }
 
     private void MoveArmies()

@@ -8,21 +8,28 @@ public enum Team { Red, Blue, Neutral };
 public class Army : MonoBehaviour {
     [SerializeField]
     private Team team;
-    [SerializeField]
-    bool randomizeStats;
     private Vector2 nextWaypoint;
     private Text powerText;
     private Vector2 invalidPos = new Vector2(-1, -1);
     private bool inCombat;
     private GameManager gameManager;
     private List<Army> enemiesInRange = new List<Army>();
-    private CombatUnit combatUnit = new CombatUnit();
+
+    #region Combat Stats
+    private int power;
+    [SerializeField]
+    private int attackDamage = 10;
+    [SerializeField]
+    private int armySize = 100;
+    [SerializeField]
+    private float speed = 0.03f;
+    [SerializeField]
+    private float range = 0.5f;
+    #endregion
 
     private void Awake()
     {
         gameManager = FindObjectOfType<GameManager>();
-        if (randomizeStats)
-            combatUnit.RandomizeStats();
     }
 
     private void Start()
@@ -30,7 +37,67 @@ public class Army : MonoBehaviour {
         powerText = GetComponentInChildren<Text>();
         nextWaypoint = invalidPos;
         // Post-init
+        UpdatePower();
+        OnRangeChanged();
         UpdateText();
+    }
+
+    //private void Update()
+    //{
+    //    OnRangeChanged();
+    //}
+
+    private void OnRangeChanged()
+    {
+        var rangeManager = GetComponentInChildren<ArmyRangeManager>();
+        var coll = rangeManager.GetComponent<CircleCollider2D>();
+        coll.radius = range;
+    }
+
+    internal void RandomizeStats()
+    {
+        attackDamage = UnityEngine.Random.Range(1, 6);
+        armySize = UnityEngine.Random.Range(5, 15);
+        speed = UnityEngine.Random.Range(0.01f, 0.04f);
+        range = UnityEngine.Random.Range(0.5f, 1f);
+        UpdatePower();
+    }
+
+    internal void SetTeam(Team newTeam)
+    {
+        team = newTeam;
+
+        var renderer = GetComponent<SpriteRenderer>();
+        if (team == Team.Red)
+            renderer.color = new Color(255, 0, 0);
+        else if (team == Team.Blue)
+            renderer.color = new Color(0, 0, 255);
+    }
+
+    private void UpdatePower()
+    {
+        power = armySize * attackDamage;
+    }
+
+    internal void TakeDamage(Army army)
+    {
+        armySize -= army.attackDamage;
+        UpdatePower();
+    }
+
+    internal string GetPower()
+    {
+        return power.ToString();
+    }
+
+    internal bool IsAlive()
+    {
+        return armySize > 0;
+    }
+
+    internal float GetSpeed()
+    {
+        return speed;
     }
 
     internal void OnEnemyInRange(Army enemy)
@@ -57,7 +124,7 @@ public class Army : MonoBehaviour {
     void FixedUpdate () {
 		if(nextWaypoint != invalidPos)
         {
-            var newPos = Vector2.MoveTowards(transform.position, nextWaypoint, combatUnit.GetSpeed());
+            var newPos = Vector2.MoveTowards(transform.position, nextWaypoint, GetSpeed());
             transform.position = newPos;
             if (Vector2.Distance(transform.position, nextWaypoint) < .005)
             {
@@ -100,19 +167,14 @@ public class Army : MonoBehaviour {
 
     private void Attack(Army enemy)
     {
-        enemy.combatUnit.TakeDamage(combatUnit);
+        enemy.TakeDamage(this);
         enemy.UpdateText();
         //Debug.Log(team + " attacked: " + attack + "dmg. " + enemy.team + " hp: " + enemy.hp);
     }
     
     private void UpdateText()
     {
-        powerText.text = combatUnit.GetPower();
-    }
-
-    internal bool IsAlive()
-    {
-        return combatUnit.IsAlive();
+        powerText.text = GetPower();
     }
 
     internal void Stop()

@@ -10,14 +10,18 @@ public class Player : MonoBehaviour
     [SerializeField]
     protected int maxArmyCount;
     [SerializeField]
-    protected GameObject armyPrefab;
+    protected GameObject infantryPrefab;
+    [SerializeField]
+    protected GameObject artilleryPrefab;
     [SerializeField]
     private GameObject hqPrefab;
     protected HQ hq;
     protected List<Army> armies;
     private int cash;
     private int score;
-    private int MAX_CASH = 9999;
+    private const int MAX_CASH = 9999;
+    [SerializeField]
+    private Team team;
 
     private void Awake()
     {
@@ -40,27 +44,42 @@ public class Player : MonoBehaviour
         return cash;
     }
 
-    public void AttemptBuyArmy(Direction dir)
+    public void AttemptBuyArmy(ArmyType type)
     {
-        if (cash >= 100)
+        switch (type)
         {
-            SpawnArmy(hq.GetSpawnPoint());
-            cash -= 100;
+            case ArmyType.Infantry:
+                if (cash >= 50)
+                {
+                    SpawnArmy(hq.GetSpawnPoint(), infantryPrefab);
+                    cash -= 50;
+                }
+                break;
+            case ArmyType.Artillery:
+                if (cash >= 100)
+                {
+                    SpawnArmy(hq.GetSpawnPoint(), artilleryPrefab);
+                    cash -= 100;
+                }
+                break;
+            default:
+                throw new System.ArgumentException();
         }
     }
 
-    private void SpawnArmies()
+    protected virtual void SpawnArmies()
     {
         for (int i = 0; i < maxArmyCount; i++)
         {
-            SpawnArmy(hq.GetSpawnPoint());
+            SpawnArmy(hq.GetSpawnPoint(), infantryPrefab);
         }
     }
 
-    protected void SpawnArmy(Vector2 spawnPoint)
+    protected virtual void SpawnArmy(Vector2 spawnPoint, GameObject prefab)
     {
-        var newArmy = Instantiate(armyPrefab, transform).GetComponent<Army>();
+        var newArmy = Instantiate(prefab, transform).GetComponent<Army>();
         newArmy.transform.position = spawnPoint;
+        newArmy.SetTeam(team);
         armies.Add(newArmy);
     }
 

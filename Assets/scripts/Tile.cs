@@ -91,9 +91,9 @@ public class Tile : MonoBehaviour {
         var renderer = GetComponent<SpriteRenderer>();
 
         if (controllingTeam == Team.Red)
-            renderer.color = new Color(200, 0, 0);
+            renderer.color = new Color(100, 0, 0);
         else if (controllingTeam == Team.Blue)
-            renderer.color = new Color(0, 0, 200);
+            renderer.color = new Color(0, 0, 100);
         else if (controllingTeam == Team.Neutral)
             renderer.color = new Color(255, 255, 255);
         else
