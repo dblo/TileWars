@@ -8,11 +8,16 @@ public class GameManager : MonoBehaviour
 {
     private GameBoard gameBoard;
     private Army selectedArmy;
-    private List<Tile> contestedTiles = new List<Tile>();
+    //private List<Tile> contestedTiles = new List<Tile>();
     private int logicCounter;
     private const int LOGIC_TICKS = 50;
-    Player p1;
-    Player p2;
+    private Player p1;
+    private Player p2;
+    private List<Vector2> swipePath = new List<Vector2>();
+    private float nextMousePoll;
+    private const float MOUSE_POLL_RATE = 0.1f;
+    private const float MIN_SWIPE_TIME = 0.2f;
+    private float swipeStartTime = -1;
 
     void Start()
     {
@@ -25,12 +30,23 @@ public class GameManager : MonoBehaviour
         var p2GO = GameObject.Find("AIPlayer");
         if(p2GO != null)
             p2 = p2GO.GetComponent<Player>();
+
+        nextMousePoll = Time.time;
     }
 
     //public void AddContestedTile(Tile tile)
     //{
     //    contestedTiles.Add(tile);
     //}
+
+    private void Update()
+    {
+        if(nextMousePoll <= Time.time)
+        {
+            nextMousePoll = Time.time + MOUSE_POLL_RATE;
+            HandleMouseGesture();
+        }
+    }
 
     private void FixedUpdate()
     {
@@ -123,7 +139,7 @@ public class GameManager : MonoBehaviour
         if (selectedArmy != null)
         {
             var worldCoord = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            selectedArmy.MoveTo(worldCoord);
+            //selectedArmy.MoveTo(worldCoord);
             selectedArmy = null;
         }
         else
@@ -139,4 +155,29 @@ public class GameManager : MonoBehaviour
     //{
     //    return selectedArmy != null;
     //}
+
+    void HandleMouseGesture()
+    {
+        if (selectedArmy == null)
+            return;
+
+        if (Input.GetMouseButton(0))
+        {
+            if (swipeStartTime < 0)
+            {
+                swipeStartTime = Time.time;
+            }
+            swipePath.Add(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+        }
+        else if(swipeStartTime > 0)
+        {
+            if(swipeStartTime + MIN_SWIPE_TIME <= Time.time)
+            {
+                selectedArmy.GiveNewPath(swipePath);
+            }
+            swipePath = new List<Vector2>();
+            swipeStartTime = -1;
+            return;
+        }
+    }
 }

@@ -8,12 +8,11 @@ public enum Team { Red, Blue, Neutral };
 public class Army : MonoBehaviour {
     [SerializeField]
     private Team team;
-    private Vector2 nextWaypoint;
     private Text powerText;
-    private Vector2 invalidPos = new Vector2(-1, -1);
     private bool inCombat;
     private GameManager gameManager;
     private List<Army> enemiesInRange = new List<Army>();
+    private List<Vector2> currentTravelPath = new List<Vector2>();
 
     #region Combat Stats
     private int power;
@@ -35,7 +34,6 @@ public class Army : MonoBehaviour {
     private void Start()
     {
         powerText = GetComponentInChildren<Text>();
-        nextWaypoint = invalidPos;
         // Post-init
         UpdatePower();
         OnRangeChanged();
@@ -113,7 +111,7 @@ public class Army : MonoBehaviour {
 
     internal bool IsStationary()
     {
-        return nextWaypoint == invalidPos;
+        return currentTravelPath.Count == 0;
     }
 
     internal bool IsInCombat()
@@ -121,14 +119,21 @@ public class Army : MonoBehaviour {
         return inCombat;
     }
 
+    private Vector2 NextWaypoint()
+    {
+        if (currentTravelPath.Count == 0)
+            throw new System.ArgumentException();
+        return currentTravelPath[0];
+    }
+
     void FixedUpdate () {
-		if(nextWaypoint != invalidPos)
+		if(currentTravelPath.Count > 0)
         {
-            var newPos = Vector2.MoveTowards(transform.position, nextWaypoint, GetSpeed());
+            var newPos = Vector2.MoveTowards(transform.position, NextWaypoint(), GetSpeed());
             transform.position = newPos;
-            if (Vector2.Distance(transform.position, nextWaypoint) < .005)
+            if (Vector2.Distance(transform.position, NextWaypoint()) < .05)
             {
-                nextWaypoint = invalidPos;
+                currentTravelPath.RemoveAt(0);
             }
         }
 	}
@@ -144,12 +149,13 @@ public class Army : MonoBehaviour {
 
     internal void MoveTo(Tile tile)
     {
-        nextWaypoint = tile.transform.position;
+        MoveTo(tile.transform.position);
     }
 
     internal void MoveTo(Vector3 worldCoord)
     {
-        nextWaypoint = worldCoord;
+        currentTravelPath.Clear();
+        currentTravelPath.Add(worldCoord);
     }
 
     internal Team GetTeam()
@@ -179,12 +185,17 @@ public class Army : MonoBehaviour {
 
     internal void Stop()
     {
-        nextWaypoint = invalidPos;
+        currentTravelPath.Clear();
     }
 
     private void OnMouseDown()
     {
         gameManager.OnArmyClicked(this);
+    }
+
+    internal void GiveNewPath(List<Vector2> swipePath)
+    {
+        currentTravelPath = swipePath;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
