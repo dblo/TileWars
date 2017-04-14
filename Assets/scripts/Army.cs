@@ -69,9 +69,9 @@ public class Army : MonoBehaviour {
 
         var renderer = GetComponent<SpriteRenderer>();
         if (team == Team.Red)
-            renderer.color = new Color(255, 0, 0);
+            renderer.color = Color.magenta;// new Color(230, 130, 130);
         else if (team == Team.Blue)
-            renderer.color = new Color(0, 0, 255);
+            renderer.color = Color.cyan;// new Color(0, 0, 255);
     }
 
     private void UpdatePower()
