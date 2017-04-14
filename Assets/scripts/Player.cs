@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
 
 public enum ArmyType { Infantry, Artillery };
 
@@ -16,20 +14,15 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject hqPrefab;
     protected HQ hq;
+    protected List<Army> armies;
+    private int cash;
+    private int score;
+    private int MAX_CASH = 9999;
 
     private void Awake()
     {
         hq = Instantiate(hqPrefab, transform).GetComponent<HQ>();
     }
-
-    internal int GetCash()
-    {
-        return cash;
-    }
-
-    protected List<Army> armies;
-    private int cash;
-    private int score;
 
     virtual protected void Start()
     {
@@ -40,6 +33,11 @@ public class Player : MonoBehaviour
     public ReadOnlyCollection<Army> GetArmies()
     {
         return armies.AsReadOnly();
+    }
+
+    internal int GetCash()
+    {
+        return cash;
     }
 
     public void AttemptBuyArmy(Direction dir)
@@ -83,6 +81,8 @@ public class Player : MonoBehaviour
     internal void AddCash(int val)
     {
         cash += val;
+        if (cash >= MAX_CASH)
+            cash = MAX_CASH;
     }
 
     internal void UpdateUI()
