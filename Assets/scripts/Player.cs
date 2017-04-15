@@ -17,6 +17,7 @@ public class Player : MonoBehaviour
     private GameObject hqPrefab;
     protected HQ hq;
     protected List<Army> armies;
+    [SerializeField]
     private int cash;
     private int score;
     private const int MAX_CASH = 9999;

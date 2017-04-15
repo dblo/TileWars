@@ -5,13 +5,7 @@ using UnityEngine;
 public class Tile : MonoBehaviour {
     private List<Army> redOccupants = new List<Army>();
     private List<Army> blueOccupants = new List<Army>();
-    private GameManager gameManager;
     private Team controllingTeam = Team.Neutral;
-
-    private void Awake()
-    {
-        gameManager = FindObjectOfType<GameManager>();
-    }
 
     internal int GetScoreValue()
     {
@@ -82,7 +76,7 @@ public class Tile : MonoBehaviour {
 
     private void OnMouseDown()
     {
-        gameManager.OnTileClicked(this);
+        GameManager.Get().OnTileClicked(this);
     }
 
     private void ChangeControllingTeam(Team team)

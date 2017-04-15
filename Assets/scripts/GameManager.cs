@@ -19,12 +19,27 @@ public class GameManager : MonoBehaviour
     private const float MIN_SWIPE_TIME = 0.2f;
     private float swipeStartTime = -1;
 
+    private static GameManager instance;
+
+    private void Awake()
+    {
+        instance = this;
+    }
+
+    // Is this reliable if using callied from other script's Awake()?
+    public static GameManager Get()
+    {
+        if (instance == null)
+            throw new System.NullReferenceException();
+        return instance;
+    }
+
     void Start()
     {
         gameBoard = FindObjectOfType<GameBoard>();
         // Copy scale and pos from gameBoard so that the GameManager collider covers the entire board
-        transform.localScale = new Vector3(gameBoard.GetColsCount(), gameBoard.GetRowsCount());
-        transform.position = new Vector3(gameBoard.GetColsCount() / 2f, gameBoard.GetRowsCount() / 2f, -1);
+        //transform.localScale = new Vector3(gameBoard.GetColsCount(), gameBoard.GetRowsCount());
+        //transform.position = new Vector3(gameBoard.GetColsCount() / 2f, gameBoard.GetRowsCount() / 2f, -1);
         p1 = GameObject.Find("Player").GetComponent<Player>();
 
         var p2GO = GameObject.Find("AIPlayer");
@@ -145,8 +160,16 @@ public class GameManager : MonoBehaviour
         {
             //var worldCoord = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             //selectedArmy.MoveTo(worldCoord);
+            ClearArmySelection();
         }
-        ClearArmySelection();
+    }
+
+    internal void OnHQClicked()
+    {
+        if (selectedArmy)
+        {
+            ClearArmySelection();
+        }
     }
 
     private bool ArmySelected()

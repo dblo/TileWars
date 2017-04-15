@@ -14,7 +14,7 @@ public class ArmyRangeManager : MonoBehaviour {
     {
         return parent;
     }
-
+    
     private void OnTriggerEnter2D(Collider2D collision)
     {
         var enemy = collision.GetComponent<ArmyRangeManager>();

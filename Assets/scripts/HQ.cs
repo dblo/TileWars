@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class HQ : MonoBehaviour
@@ -6,6 +7,9 @@ public class HQ : MonoBehaviour
     private Text cashText;
     private Player player;
     private bool buying;
+
+    private const float MIN_LONG_PRESS_DURATION = 0.4f;
+    private float swipeStartTime = -1;
 
     void Awake()
     {
@@ -22,25 +26,36 @@ public class HQ : MonoBehaviour
     {
         return transform.position;
     }
-
-    private void HandleMouseInteraction()
-    {
-        if (Input.GetMouseButton(1) && buying)
-        {
-            player.AttemptBuyArmy(ArmyType.Artillery);
-        }
-        else if (Input.GetMouseButton(0) && buying)
-        {
-            player.AttemptBuyArmy(ArmyType.Infantry);
-        }
-    }
-
+    
     private void OnMouseDown()
     {
-        if (buying)
+        GameManager.Get().OnHQClicked();
+        swipeStartTime = Time.time;
+    }
+
+    private void OnMouseUp()
+    {
+        if(swipeStartTime + MIN_LONG_PRESS_DURATION <= Time.time)
         {
-            HandleMouseInteraction();
+            OnLongPress();
         }
+        else
+        {
+            OnShortPress();
+        }
+        swipeStartTime = -1;
         buying = !buying;
+    }
+
+    private void OnShortPress()
+    {
+        if(buying)
+            player.AttemptBuyArmy(ArmyType.Infantry);
+    }
+
+    private void OnLongPress()
+    {
+        if(buying)
+            player.AttemptBuyArmy(ArmyType.Artillery);
     }
 }

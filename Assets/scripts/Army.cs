@@ -10,7 +10,6 @@ public class Army : MonoBehaviour {
     private Team team;
     private Text powerText;
     private bool inCombat;
-    private GameManager gameManager;
     private List<Army> enemiesInRange = new List<Army>();
     private List<Vector2> currentTravelPath = new List<Vector2>();
     private List<Army> collidingEnemies = new List<Army>();
@@ -30,8 +29,6 @@ public class Army : MonoBehaviour {
 
     private void Awake()
     {
-        gameManager = FindObjectOfType<GameManager>();
-
         foreach (Transform trans in transform)
         {
             if(trans.name == "RangeDisplay")
@@ -201,7 +198,7 @@ public class Army : MonoBehaviour {
 
     private void OnMouseDown()
     {
-        gameManager.OnArmyClicked(this);
+        GameManager.Get().OnArmyClicked(this);
     }
 
     internal void GiveNewPath(List<Vector2> swipePath)
