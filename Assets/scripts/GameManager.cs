@@ -131,23 +131,32 @@ public class GameManager : MonoBehaviour
 
     internal void OnArmyClicked(Army army)
     {
+        if (selectedArmy)
+        {
+            ClearArmySelection();
+        }
         selectedArmy = army;
+        selectedArmy.SetShowRangeDisplay(true);
     }
 
     internal void OnTileClicked(Tile tile)
     {
-        if (selectedArmy != null)
+        if (ArmySelected())
         {
-            var worldCoord = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            //var worldCoord = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             //selectedArmy.MoveTo(worldCoord);
-            selectedArmy = null;
         }
-        else
-            ClearSelection();
+        ClearArmySelection();
     }
 
-    private void ClearSelection()
+    private bool ArmySelected()
     {
+        return selectedArmy != null;
+    }
+
+    private void ClearArmySelection()
+    {
+        selectedArmy.SetShowRangeDisplay(false);
         selectedArmy = null;
     }
 

@@ -13,6 +13,8 @@ public class Army : MonoBehaviour {
     private GameManager gameManager;
     private List<Army> enemiesInRange = new List<Army>();
     private List<Vector2> currentTravelPath = new List<Vector2>();
+    private List<Army> collidingEnemies = new List<Army>();
+    private Transform rangeDisplay;
 
     #region Combat Stats
     private int power;
@@ -29,6 +31,15 @@ public class Army : MonoBehaviour {
     private void Awake()
     {
         gameManager = FindObjectOfType<GameManager>();
+
+        foreach (Transform trans in transform)
+        {
+            if(trans.name == "RangeDisplay")
+            {
+                rangeDisplay = trans;
+                break;
+            }
+        }
     }
 
     private void Start()
@@ -127,7 +138,7 @@ public class Army : MonoBehaviour {
     }
 
     void FixedUpdate () {
-		if(currentTravelPath.Count > 0)
+		if(currentTravelPath.Count > 0 && collidingEnemies.Count == 0)
         {
             var newPos = Vector2.MoveTowards(transform.position, NextWaypoint(), GetSpeed());
             transform.position = newPos;
@@ -203,7 +214,7 @@ public class Army : MonoBehaviour {
         var army = collision.GetComponent<Army>();
         if(army != null && IsEnemy(army))
         {
-            Stop();
+            collidingEnemies.Add(army);
             return;
         }
         if (collision.gameObject.name == "Wall(Clone)") // TODO improve
@@ -217,7 +228,13 @@ public class Army : MonoBehaviour {
         var army = collision.GetComponent<Army>();
         if (army != null && IsEnemy(army))
         {
-            OnEnemyOutOfRange(army);
+            collidingEnemies.Remove(army);
+            OnEnemyOutOfRange(army);// TODO ???
         }
+    }
+
+    public void SetShowRangeDisplay(bool val)
+    {
+        rangeDisplay.gameObject.SetActive(val);
     }
 }
