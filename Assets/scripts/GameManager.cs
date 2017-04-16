@@ -146,6 +146,9 @@ public class GameManager : MonoBehaviour
 
     internal void OnArmyClicked(Army army)
     {
+        if (selectedArmy == army)
+            return;
+
         if (selectedArmy)
         {
             ClearArmySelection();

@@ -72,7 +72,7 @@ public class Player : MonoBehaviour
     {
         for (int i = 0; i < maxArmyCount; i++)
         {
-            SpawnArmy(hq.GetSpawnPoint(), infantryPrefab);
+            SpawnArmy(hq.GetSpawnPoint(), artilleryPrefab);
         }
     }
 

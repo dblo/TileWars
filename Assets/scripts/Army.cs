@@ -7,7 +7,7 @@ public enum Team { Red, Blue, Neutral };
 
 public class Army : MonoBehaviour {
     [SerializeField]
-    private Team team;
+    protected Team team;
     private Text powerText;
     private bool inCombat;
     private List<Army> enemiesInRange = new List<Army>();
@@ -18,16 +18,16 @@ public class Army : MonoBehaviour {
     #region Combat Stats
     private int power;
     [SerializeField]
-    private int attackDamage = 10;
+    protected int attackDamage = 10;
     [SerializeField]
     private int armySize = 100;
     [SerializeField]
     private float speed = 0.03f;
     [SerializeField]
-    private float range = 0.5f;
+    protected float range = 0.5f;
     #endregion
 
-    private void Awake()
+    protected virtual void Awake()
     {
         foreach (Transform trans in transform)
         {
@@ -53,11 +53,13 @@ public class Army : MonoBehaviour {
     //    OnRangeChanged();
     //}
 
-    private void OnRangeChanged()
+    protected virtual void OnRangeChanged()
     {
         var rangeManager = GetComponentInChildren<ArmyRangeManager>();
         var coll = rangeManager.GetComponent<CircleCollider2D>();
         coll.radius = range;
+
+        rangeDisplay.localScale = new Vector3(range, range);
     }
 
     internal void RandomizeStats()
@@ -194,14 +196,17 @@ public class Army : MonoBehaviour {
     internal void Stop()
     {
         currentTravelPath.Clear();
+        //if (currentTravelPath.Count > 0)
+            //currentTravelPath.RemoveAt(0);
     }
 
-    private void OnMouseDown()
+    protected virtual void OnMouseDown()
     {
         GameManager.Get().OnArmyClicked(this);
+
     }
 
-    internal void GiveNewPath(List<Vector2> swipePath)
+    public virtual void GiveNewPath(List<Vector2> swipePath)
     {
         currentTravelPath = swipePath;
     }
@@ -230,7 +235,7 @@ public class Army : MonoBehaviour {
         }
     }
 
-    public void SetShowRangeDisplay(bool val)
+    public virtual void SetShowRangeDisplay(bool val)
     {
         rangeDisplay.gameObject.SetActive(val);
     }

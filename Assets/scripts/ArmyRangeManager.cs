@@ -5,7 +5,6 @@ using UnityEngine;
 public class ArmyRangeManager : MonoBehaviour {
     private Army parent;
 
-	// Use this for initialization
 	void Awake () {
         parent = transform.parent.GetComponent<Army>();
 	}
