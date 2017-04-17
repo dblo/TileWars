@@ -193,11 +193,10 @@ public class Army : MonoBehaviour {
         powerText.text = GetPower();
     }
 
-    internal void Stop()
+    internal void RemoveUnreachableWaypoint()
     {
-        currentTravelPath.Clear();
-        //if (currentTravelPath.Count > 0)
-            //currentTravelPath.RemoveAt(0);
+        if (currentTravelPath.Count > 0)
+            currentTravelPath.RemoveAt(0);
     }
 
     protected virtual void OnMouseDown()
@@ -211,23 +210,27 @@ public class Army : MonoBehaviour {
         currentTravelPath = swipePath;
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        var army = collision.GetComponent<Army>();
+        var army = collision.collider.GetComponent<Army>();
         if(army != null && IsEnemy(army))
         {
             collidingEnemies.Add(army);
             return;
         }
+    }
+
+    private void OnCollisionStay2D(Collision2D collision)
+    {
         if (collision.gameObject.name == "Wall(Clone)") // TODO improve
         {
-            Stop();
+            RemoveUnreachableWaypoint();
         }
     }
 
-    private void OnTriggerExit2D(Collider2D collision)
+    private void OnCollisionExit2D(Collision2D collision)
     {
-        var army = collision.GetComponent<Army>();
+        var army = collision.collider.GetComponent<Army>();
         if (army != null && IsEnemy(army))
         {
             collidingEnemies.Remove(army);
