@@ -87,9 +87,9 @@ public class Army : MonoBehaviour {
         power = armySize * attackDamage;
     }
 
-    internal void TakeDamage(Army army)
+    internal void TakeDamage(int damage)
     {
-        armySize -= army.attackDamage;
+        armySize -= damage;
         UpdatePower();
     }
 
@@ -181,9 +181,9 @@ public class Army : MonoBehaviour {
         }
     }
 
-    private void Attack(Army enemy)
+    protected virtual void Attack(Army enemy)
     {
-        enemy.TakeDamage(this);
+        enemy.TakeDamage(attackDamage);
         enemy.UpdateText();
         //Debug.Log(team + " attacked: " + attack + "dmg. " + enemy.team + " hp: " + enemy.hp);
     }

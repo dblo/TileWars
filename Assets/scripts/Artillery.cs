@@ -1,20 +1,25 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 public class Artillery : Army
 {
+    public GameObject shellPrefab;
+    [SerializeField]
+    private float reloadTime = 2;
+    [SerializeField]
+    private float bombardDamageRadius;
+    [SerializeField]
+    private int bombardDamge;
+
     private const float MIN_SWIPE_TIME = 0.5f;
     private float swipeStartTime = -1;
     private Transform bombardDisplay;
     private Vector2 invalidPos = new Vector2(-1, -1);
     private Vector2 bombardTarget;
-    [SerializeField]
     private float remainingReloadTime;
-    [SerializeField]
-    private float bombardDamageRadius;
-    private float reloadTime = 1;
     private bool acceptNewPath;
-
+    
     protected override void Awake()
     {
         base.Awake();
@@ -35,7 +40,7 @@ public class Artillery : Army
         {
             remainingReloadTime -= Time.deltaTime;
         }
-        else if (bombardTarget != invalidPos)
+        else if (IsBombaring())
         {
             Bombard();
             remainingReloadTime = reloadTime;
@@ -44,13 +49,21 @@ public class Artillery : Army
 
     private void Bombard()
     {
+        var shell = Instantiate(shellPrefab);
+        var sr = shell.GetComponent<SpriteRenderer>();
+        shell.transform.position = bombardTarget;
+        var color = sr.color;
+        color.a = 0.5f;
+        sr.color = color;
+        Destroy(shell, 1.5f);
+
         var colls = Physics2D.OverlapCircleAll(bombardTarget, bombardDamageRadius);
         foreach (var coll in colls)
         {
-            var enemy = coll.gameObject.GetComponent<Army>();
-            if (enemy != null && enemy.GetTeam() != team)
+            var army = coll.gameObject.GetComponent<Army>();
+            if (army != null && IsEnemy(army))
             {
-                enemy.TakeDamage(this);
+                army.TakeDamage(bombardDamge);
             }
         }
     }
@@ -68,11 +81,25 @@ public class Artillery : Army
         swipeStartTime = Time.time;
     }
 
+    protected override void Attack(Army enemy)
+    {
+        // While bombarding, targets in range but not in bombardment area are ignored.
+        if (!IsBombaring())
+        {
+            base.Attack(enemy);
+        }
+    }
+
+    private bool IsBombaring()
+    {
+        return bombardTarget != invalidPos;
+    }
+
     protected void OnMouseUp()
     {
         if (SelectingBombardTarget())
         {
-            bombardTarget = Input.mousePosition;
+            bombardTarget = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             remainingReloadTime = 0;
             SetShowBombardDisplay(false);
             swipeStartTime = -1;
