@@ -6,13 +6,14 @@ using UnityEngine.UI;
 public enum Team { Red, Blue, Neutral };
 
 public class Army : MonoBehaviour {
+    private const double REACHED_WAYPOINT_DISTANCE = .05;
     [SerializeField]
     protected Team team;
     private Text powerText;
     private bool inCombat;
     private List<Army> enemiesInRange = new List<Army>();
-    private List<Vector2> currentTravelPath = new List<Vector2>();
     private List<Army> collidingEnemies = new List<Army>();
+    private List<Vector2> currentTravelPath = new List<Vector2>();
     protected Transform rangeDisplay;
 
     #region Combat Stats
@@ -98,9 +99,6 @@ public class Army : MonoBehaviour {
 
     protected virtual void OnRangeChanged(float aRange)
     {
-        var rangeManager = GetComponentInChildren<ArmyRangeManager>();
-        var coll = rangeManager.GetComponent<CircleCollider2D>();
-        coll.radius = aRange;
         rangeDisplay.localScale = new Vector3(aRange, aRange);
     }
 
@@ -141,12 +139,13 @@ public class Army : MonoBehaviour {
         inCombat = true;
     }
 
-    void FixedUpdate () {
-		if(currentTravelPath.Count > 0 && collidingEnemies.Count == 0)
+    void FixedUpdate ()
+    {
+        if (currentTravelPath.Count > 0 && collidingEnemies.Count == 0)
         {
             var newPos = Vector2.MoveTowards(transform.position, GetNextWaypoint(), GetSpeed());
             transform.position = newPos;
-            if (Vector2.Distance(transform.position, GetNextWaypoint()) < .05)
+            if (Vector2.Distance(transform.position, GetNextWaypoint()) < REACHED_WAYPOINT_DISTANCE)
             {
                 currentTravelPath.RemoveAt(0);
             }

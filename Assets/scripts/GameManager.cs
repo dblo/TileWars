@@ -8,7 +8,6 @@ public class GameManager : MonoBehaviour
 {
     private GameBoard gameBoard;
     private Army selectedArmy;
-    //private List<Tile> contestedTiles = new List<Tile>();
     private int logicCounter;
     private const int LOGIC_TICKS = 50;
     private Player p1;
@@ -49,11 +48,6 @@ public class GameManager : MonoBehaviour
 
         nextMousePoll = Time.time;
     }
-
-    //public void AddContestedTile(Tile tile)
-    //{
-    //    contestedTiles.Add(tile);
-    //}
 
     private void Update()
     {
@@ -186,11 +180,6 @@ public class GameManager : MonoBehaviour
         selectedArmy.SetShowRangeDisplay(false);
         selectedArmy = null;
     }
-
-    //private bool ObjectSelected()
-    //{
-    //    return selectedArmy != null;
-    //}
 
     void HandleMouseGesture()
     {
