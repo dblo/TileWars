@@ -99,6 +99,8 @@ public class Army : MonoBehaviour {
 
     protected virtual void OnRangeChanged(float aRange)
     {
+        var coll = transform.Find("RangeManager").GetComponent<CircleCollider2D>();
+        coll.radius = aRange;
         rangeDisplay.localScale = new Vector3(aRange, aRange);
     }
 

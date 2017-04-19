@@ -1,22 +1,22 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 public class Artillery : Army
 {
     public GameObject shellPrefab;
-    [SerializeField]
-    private float reloadTime;
-    [SerializeField]
-    private float shellDamageRadius;
-    [SerializeField]
-    private int bombardDamge;
+    //[SerializeField]
+    //private float reloadTime;
+    //[SerializeField]
+    //private float shellDamageRadius;
+    //[SerializeField]
+    //private int bombardDamge;
     [SerializeField]
     private float bombardRange;
+    private float deplomentTimer = 0;
 
     private const float SHELL_LIFETIME = 0.7f;
-
-    private float remainingReloadTime;
-    private bool inBombardMode;
+    private const float DEPLOY_TIME = 4f;
 
     protected override void Awake()
     {
@@ -25,20 +25,24 @@ public class Artillery : Army
 
     void Update()
     {
-        if (IsReloading())
+        if (Deploying())
         {
-            remainingReloadTime -= Time.deltaTime;
+            deplomentTimer -= Time.deltaTime;
+            if (deplomentTimer <= 0 && IsStationary())
+            {
+                SetBombardMode(true);
+            }
         }
-        else if (inBombardMode)
-        {
-            //Bombard();
-            remainingReloadTime = reloadTime;
-        }
+    }
+
+    private bool Deploying()
+    {
+        return deplomentTimer > 0 && IsStationary();
     }
 
     private bool IsReloading()
     {
-        return remainingReloadTime > 0;
+        return deplomentTimer > 0;
     }
 
     //private void Bombard()
@@ -67,18 +71,13 @@ public class Artillery : Army
 
     protected override void Attack(Army enemy)
     {
-        // While bombarding, targets in range but not in bombardment area are ignored.
-        //if (!inBombardMode)
-        {
+        if(!Deploying())
             base.Attack(enemy);
-        }
     }
 
     private void SetBombardMode(bool val)
     {
-        inBombardMode = val;
-
-        if (inBombardMode)
+        if (val)
             OnRangeChanged(bombardRange);
         else
             OnRangeChanged(range);
@@ -87,6 +86,7 @@ public class Artillery : Army
     public override void ChangeTravelPath(List<Vector2> swipePath)
     {
         SetBombardMode(false);
+        deplomentTimer = DEPLOY_TIME;
         base.ChangeTravelPath(swipePath);
     }
 }
