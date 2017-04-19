@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UI;
@@ -14,7 +13,7 @@ public class Army : MonoBehaviour {
     private List<Army> enemiesInRange = new List<Army>();
     private List<Vector2> currentTravelPath = new List<Vector2>();
     private List<Army> collidingEnemies = new List<Army>();
-    private Transform rangeDisplay;
+    protected Transform rangeDisplay;
 
     #region Combat Stats
     private int power;
@@ -28,6 +27,55 @@ public class Army : MonoBehaviour {
     protected float range = 0.5f;
     #endregion
 
+    #region Getters/Setters/Predicates
+    internal bool IsAlive()
+    {
+        return armySize > 0;
+    }
+
+    internal float GetSpeed()
+    {
+        return speed;
+    }
+
+    internal bool IsEnemy(Army other)
+    {
+        return team != other.team;
+    }
+
+    internal bool IsStationary()
+    {
+        return currentTravelPath.Count == 0;
+    }
+
+    internal bool IsInCombat()
+    {
+        return inCombat;
+    }
+
+    internal string GetPower()
+    {
+        return power.ToString();
+    }
+
+    public virtual void SetShowRangeDisplay(bool val)
+    {
+        rangeDisplay.gameObject.SetActive(val);
+    }
+
+    private Vector2 GetNextWaypoint()
+    {
+        if (currentTravelPath.Count == 0)
+            throw new System.ArgumentException();
+        return currentTravelPath[0];
+    }
+
+    internal Team GetTeam()
+    {
+        return team;
+    }
+    #endregion
+
     protected virtual void Awake()
     {
         foreach (Transform trans in transform)
@@ -38,29 +86,22 @@ public class Army : MonoBehaviour {
                 break;
             }
         }
+        powerText = GetComponentInChildren<Text>();
     }
 
     private void Start()
     {
-        powerText = GetComponentInChildren<Text>();
-        // Post-init
         UpdatePower();
-        OnRangeChanged();
+        OnRangeChanged(range);
         UpdateText();
     }
 
-    //private void Update()
-    //{
-    //    OnRangeChanged();
-    //}
-
-    protected virtual void OnRangeChanged()
+    protected virtual void OnRangeChanged(float aRange)
     {
         var rangeManager = GetComponentInChildren<ArmyRangeManager>();
         var coll = rangeManager.GetComponent<CircleCollider2D>();
-        coll.radius = range;
-
-        rangeDisplay.localScale = new Vector3(range, range);
+        coll.radius = aRange;
+        rangeDisplay.localScale = new Vector3(aRange, aRange);
     }
 
     internal void RandomizeStats()
@@ -72,7 +113,7 @@ public class Army : MonoBehaviour {
         UpdatePower();
     }
 
-    internal void SetTeam(Team newTeam)
+    internal void ChangeTeam(Team newTeam)
     {
         team = newTeam;
 
@@ -94,55 +135,18 @@ public class Army : MonoBehaviour {
         UpdatePower();
     }
 
-    internal string GetPower()
-    {
-        return power.ToString();
-    }
-
-    internal bool IsAlive()
-    {
-        return armySize > 0;
-    }
-
-    internal float GetSpeed()
-    {
-        return speed;
-    }
-
     internal void OnEnemyInRange(Army enemy)
     {
         enemiesInRange.Add(enemy);
         inCombat = true;
     }
 
-    internal bool IsEnemy(Army other)
-    {
-        return team != other.team;
-    }
-
-    internal bool IsStationary()
-    {
-        return currentTravelPath.Count == 0;
-    }
-
-    internal bool IsInCombat()
-    {
-        return inCombat;
-    }
-
-    private Vector2 NextWaypoint()
-    {
-        if (currentTravelPath.Count == 0)
-            throw new System.ArgumentException();
-        return currentTravelPath[0];
-    }
-
     void FixedUpdate () {
 		if(currentTravelPath.Count > 0 && collidingEnemies.Count == 0)
         {
-            var newPos = Vector2.MoveTowards(transform.position, NextWaypoint(), GetSpeed());
+            var newPos = Vector2.MoveTowards(transform.position, GetNextWaypoint(), GetSpeed());
             transform.position = newPos;
-            if (Vector2.Distance(transform.position, NextWaypoint()) < .05)
+            if (Vector2.Distance(transform.position, GetNextWaypoint()) < .05)
             {
                 currentTravelPath.RemoveAt(0);
             }
@@ -167,11 +171,6 @@ public class Army : MonoBehaviour {
     {
         currentTravelPath.Clear();
         currentTravelPath.Add(worldCoord);
-    }
-
-    internal Team GetTeam()
-    {
-        return team;
     }
 
     internal void DoCombat()
@@ -206,7 +205,7 @@ public class Army : MonoBehaviour {
         GameManager.Get().OnArmyClicked(this);
     }
 
-    public virtual void GiveNewPath(List<Vector2> swipePath)
+    public virtual void ChangeTravelPath(List<Vector2> swipePath)
     {
         currentTravelPath = swipePath;
     }
@@ -234,12 +233,7 @@ public class Army : MonoBehaviour {
         if (army != null && IsEnemy(army))
         {
             collidingEnemies.Remove(army);
-            OnEnemyOutOfRange(army);// TODO ???
+            OnEnemyOutOfRange(army);
         }
-    }
-
-    public virtual void SetShowRangeDisplay(bool val)
-    {
-        rangeDisplay.gameObject.SetActive(val);
     }
 }

@@ -6,32 +6,27 @@ public class Artillery : Army
 {
     public GameObject shellPrefab;
     [SerializeField]
-    private float reloadTime = 2;
+    private float reloadTime;
     [SerializeField]
-    private float bombardDamageRadius;
+    private float shellDamageRadius;
     [SerializeField]
     private int bombardDamge;
+    [SerializeField]
+    private float bombardRange;
 
     private const float MIN_SWIPE_TIME = 0.5f;
-    private float swipeStartTime = -1;
-    private Transform bombardDisplay;
+    private const float SHELL_LIFETIME = 0.7f;
+
     private Vector2 invalidPos = new Vector2(-1, -1);
     private Vector2 bombardTarget;
+    private float swipeStartTime = -1;
     private float remainingReloadTime;
     private bool acceptNewPath;
-    private const float SHELL_LIFETIME = 0.7f;
+    private bool inBombardMode;
 
     protected override void Awake()
     {
         base.Awake();
-        foreach (Transform trans in transform)
-        {
-            if (trans.name == "BombardDisplay")
-            {
-                bombardDisplay = trans;
-                break;
-            }
-        }
         bombardTarget = invalidPos;
     }
 
@@ -48,9 +43,19 @@ public class Artillery : Army
         }
     }
 
+    private bool IsBombaring()
+    {
+        return inBombardMode && bombardTarget != invalidPos;
+    }
+
     private bool IsReloading()
     {
         return remainingReloadTime > 0;
+    }
+
+    private bool DidLongGesture()
+    {
+        return swipeStartTime >= 0 && swipeStartTime + MIN_SWIPE_TIME <= Time.time;
     }
 
     private void Bombard()
@@ -63,7 +68,7 @@ public class Artillery : Army
         sr.color = color;
         Destroy(shell, SHELL_LIFETIME);
 
-        var colls = Physics2D.OverlapCircleAll(bombardTarget, bombardDamageRadius);
+        var colls = Physics2D.OverlapCircleAll(bombardTarget, shellDamageRadius);
         foreach (var coll in colls)
         {
             var army = coll.gameObject.GetComponent<Army>();
@@ -77,10 +82,23 @@ public class Artillery : Army
         }
     }
 
-    protected override void OnRangeChanged()
+    protected override void Attack(Army enemy)
     {
-        base.OnRangeChanged();
-        bombardDisplay.localScale = new Vector3(range * 1.5f, range * 1.5f);
+        // While bombarding, targets in range but not in bombardment area are ignored.
+        if (!inBombardMode)
+        {
+            base.Attack(enemy);
+        }
+    }
+
+    private void SetBombardMode(bool val)
+    {
+        inBombardMode = val;
+
+        if (inBombardMode)
+            OnRangeChanged(bombardRange);
+        else
+            OnRangeChanged(range);
     }
 
     protected override void OnMouseDown()
@@ -90,34 +108,18 @@ public class Artillery : Army
         swipeStartTime = Time.time;
     }
 
-    protected override void Attack(Army enemy)
-    {
-        // While bombarding, targets in range but not in bombardment area are ignored.
-        if (!IsBombaring())
-        {
-            base.Attack(enemy);
-        }
-    }
-
-    private bool IsBombaring()
-    {
-        return bombardTarget != invalidPos;
-    }
-
     protected void OnMouseUp()
     {
-        if (SelectingBombardTarget())
+        if (inBombardMode)
         {
             bombardTarget = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            remainingReloadTime = 0;
-            SetShowBombardDisplay(false);
             swipeStartTime = -1;
             return;
         }
-        if (swipeStartTime  >= 0 && swipeStartTime + MIN_SWIPE_TIME <= Time.time)
+        if (DidLongGesture())
         {
-            if(IsStationary())
-                SetShowBombardDisplay(true);
+            if (IsStationary())
+                SetBombardMode(true);
         }
         swipeStartTime = -1;
     }
@@ -127,30 +129,13 @@ public class Artillery : Army
         acceptNewPath = true;
     }
 
-    private bool SelectingBombardTarget()
+    public override void ChangeTravelPath(List<Vector2> swipePath)
     {
-        return bombardDisplay.gameObject.activeSelf && bombardTarget == invalidPos;
-    }
-
-    public override void GiveNewPath(List<Vector2> swipePath)
-    {
-        if(acceptNewPath)
+        if (acceptNewPath)
         {
-            base.GiveNewPath(swipePath);
-            SetShowBombardDisplay(false);
+            base.ChangeTravelPath(swipePath);
+            SetBombardMode(false);
             bombardTarget = invalidPos;
         }
-    }
-
-    public void SetShowBombardDisplay(bool val)
-    {
-        bombardDisplay.gameObject.SetActive(val);
-    }
-
-    public override void SetShowRangeDisplay(bool val)
-    {
-        base.SetShowRangeDisplay(val);
-        if(!val)
-            SetShowBombardDisplay(false);
     }
 }

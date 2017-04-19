@@ -209,7 +209,7 @@ public class GameManager : MonoBehaviour
         {
             if(swipeStartTime + MIN_SWIPE_TIME <= Time.time)
             {
-                selectedArmy.GiveNewPath(swipePath);
+                selectedArmy.ChangeTravelPath(swipePath);
             }
             swipePath = new List<Vector2>();
             swipeStartTime = -1;

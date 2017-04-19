@@ -80,7 +80,7 @@ public class Player : MonoBehaviour
     {
         var newArmy = Instantiate(prefab, transform).GetComponent<Army>();
         newArmy.transform.position = spawnPoint;
-        newArmy.SetTeam(team);
+        newArmy.ChangeTeam(team);
         armies.Add(newArmy);
     }
 
