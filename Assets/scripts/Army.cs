@@ -232,7 +232,6 @@ public class Army : MonoBehaviour {
         if (army != null && IsEnemy(army))
         {
             collidingEnemies.Remove(army);
-            OnEnemyOutOfRange(army);
         }
     }
 }

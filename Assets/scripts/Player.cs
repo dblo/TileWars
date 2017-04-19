@@ -84,7 +84,7 @@ public class Player : MonoBehaviour
         armies.Add(newArmy);
     }
 
-    internal void KillArmy(List<Army> toRemove)
+    internal void KillArmies(List<Army> toRemove)
     {
         armies = armies.Except(toRemove).ToList();
         foreach (var army in toRemove)

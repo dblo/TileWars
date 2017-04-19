@@ -126,7 +126,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        p2.KillArmy(armiesPendingRemoval);
+        p2.KillArmies(armiesPendingRemoval);
         armiesPendingRemoval.Clear();
 
         foreach (var army in p1.GetArmies())
@@ -136,7 +136,8 @@ public class GameManager : MonoBehaviour
                 armiesPendingRemoval.Add(army);
             }
         }
-        p1.KillArmy(armiesPendingRemoval);
+        p1.KillArmies(armiesPendingRemoval);
+        armiesPendingRemoval.Clear();
     }
 
     internal void OnArmyClicked(Army army)
