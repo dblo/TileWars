@@ -19,7 +19,8 @@ public class Artillery : Army
     private Vector2 bombardTarget;
     private float remainingReloadTime;
     private bool acceptNewPath;
-    
+    private const float SHELL_LIFETIME = 0.7f;
+
     protected override void Awake()
     {
         base.Awake();
@@ -60,7 +61,7 @@ public class Artillery : Army
         var color = sr.color;
         color.a = 0.5f;
         sr.color = color;
-        Destroy(shell, 1.5f);
+        Destroy(shell, SHELL_LIFETIME);
 
         var colls = Physics2D.OverlapCircleAll(bombardTarget, bombardDamageRadius);
         foreach (var coll in colls)

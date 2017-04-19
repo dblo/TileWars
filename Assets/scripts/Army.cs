@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.UI;
 
 public enum Team { Red, Blue, Neutral };
@@ -177,6 +178,7 @@ public class Army : MonoBehaviour {
     {
         if(enemiesInRange.Count > 0)
         {
+            Assert.IsTrue(enemiesInRange[0] != null);
             Attack(enemiesInRange[0]);
         }
     }
@@ -202,7 +204,6 @@ public class Army : MonoBehaviour {
     protected virtual void OnMouseDown()
     {
         GameManager.Get().OnArmyClicked(this);
-
     }
 
     public virtual void GiveNewPath(List<Vector2> swipePath)
@@ -216,7 +217,6 @@ public class Army : MonoBehaviour {
         if(army != null && IsEnemy(army))
         {
             collidingEnemies.Add(army);
-            return;
         }
     }
 

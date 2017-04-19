@@ -24,6 +24,7 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         instance = this;
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
     }
 
     // Is this reliable if using callied from other script's Awake()?
