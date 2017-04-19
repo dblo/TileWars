@@ -29,10 +29,9 @@ public class Tile : MonoBehaviour {
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        var armyRange = collision.GetComponent<ArmyRangeManager>();
-        if(armyRange)
+        var army= collision.GetComponentInParent<Army>();
+        if(army)
         {
-            var army = armyRange.GetArmy();
             if (army.GetTeam() == Team.Red)
                 redOccupants.Add(army);
             else

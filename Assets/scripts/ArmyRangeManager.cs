@@ -1,31 +1,31 @@
 ﻿using UnityEngine;
 
 public class ArmyRangeManager : MonoBehaviour {
-    private Army parent;
+    private Army army;
 
 	void Awake () {
-        parent = transform.parent.GetComponent<Army>();
+        army = transform.GetComponent<Army>();
 	}
 
     internal Army GetArmy()
     {
-        return parent;
+        return army;
     }
     
     private void OnTriggerEnter2D(Collider2D collision)
     {
         var enemy = collision.GetComponent<ArmyRangeManager>();
-        if(enemy != null && parent.IsEnemy(enemy.parent)) {
-            parent.OnEnemyInRange(enemy.parent);
+        if(enemy != null && army.IsEnemy(enemy.army)) {
+            army.OnEnemyInRange(enemy.army);
         }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
         var enemy = collision.GetComponent<ArmyRangeManager>();
-        if (enemy != null && parent.IsEnemy(enemy.parent))
+        if (enemy != null && army.IsEnemy(enemy.army))
         {
-            parent.OnEnemyOutOfRange(enemy.parent);
+            army.OnEnemyOutOfRange(enemy.army);
         }
     }
 }

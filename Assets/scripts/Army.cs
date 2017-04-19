@@ -187,7 +187,7 @@ public class Army : MonoBehaviour {
     {
         enemy.TakeDamage(attackDamage);
         enemy.UpdateText();
-        //Debug.Log(team + " attacked: " + attack + "dmg. " + enemy.team + " hp: " + enemy.hp);
+        //Debug.Log(team + " attacked: " + attackDamage + "dmg. " + enemy.team + " hp: " + enemy.armySize);
     }
     
     private void UpdateText()
