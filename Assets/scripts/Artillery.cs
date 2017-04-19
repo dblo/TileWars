@@ -36,7 +36,7 @@ public class Artillery : Army
 
     void Update()
     {
-        if (remainingReloadTime > 0)
+        if (IsReloading())
         {
             remainingReloadTime -= Time.deltaTime;
         }
@@ -45,6 +45,11 @@ public class Artillery : Army
             Bombard();
             remainingReloadTime = reloadTime;
         }
+    }
+
+    private bool IsReloading()
+    {
+        return remainingReloadTime > 0;
     }
 
     private void Bombard()
@@ -63,6 +68,9 @@ public class Artillery : Army
             var army = coll.gameObject.GetComponent<Army>();
             if (army != null && IsEnemy(army))
             {
+                var rb = army.GetComponent<Rigidbody2D>();
+                var forceDirection = (Vector2)coll.transform.position - bombardTarget;
+                rb.AddForce(forceDirection * 100);
                 army.TakeDamage(bombardDamge);
             }
         }
