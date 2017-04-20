@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using UnityEngine;
@@ -108,5 +109,13 @@ public class Player : MonoBehaviour
     internal void UpdateUI()
     {
         hq.UpdateUI();
+    }
+
+    internal void OnEnemiesKilled(List<Army> armiesPendingRemoval)
+    {
+        foreach (var army in armies)
+        {
+            army.OnEnemiesKilled(armiesPendingRemoval);
+        }
     }
 }

@@ -27,48 +27,39 @@ public class Tile : MonoBehaviour {
         return controllingTeam;
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    public void AddOccupant(Army army)
     {
-        var army= collision.GetComponentInParent<Army>();
-        if(army)
-        {
-            if (army.GetTeam() == Team.Red)
-                redOccupants.Add(army);
-            else
-                blueOccupants.Add(army);
+        if (army.GetTeam() == Team.Red)
+            redOccupants.Add(army);
+        else
+            blueOccupants.Add(army);
 
-            if (IsContested())
-            {
-                //gameManager.AddContestedTile(this);
-            }
-            else
-            {
-                ChangeControllingTeam(army.GetTeam());
-            }
+        if (IsContested())
+        {
+            //gameManager.AddContestedTile(this);
+        }
+        else
+        {
+            ChangeControllingTeam(army.GetTeam());
         }
     }
 
-    private void OnTriggerExit2D(Collider2D collision)
+    public void RemoveOccupant(Army army)
     {
-        var armyRange = collision.GetComponent<ArmyRangeManager>();
-        if (armyRange)
+        if (army.GetTeam() == Team.Red)
         {
-            var army = armyRange.GetArmy();
-            if (army.GetTeam() == Team.Red)
+            redOccupants.Remove(army);
+            if (!IsContested() && blueOccupants.Count > 0)
             {
-                redOccupants.Remove(army);
-                if(blueOccupants.Count > 0)
-                {
-                    ChangeControllingTeam(Team.Blue);
-                }
+                ChangeControllingTeam(Team.Blue);
             }
-            else
+        }
+        else
+        {
+            blueOccupants.Remove(army);
+            if (!IsContested() && redOccupants.Count > 0)
             {
-                blueOccupants.Remove(army);
-                if(redOccupants.Count > 0)
-                {
-                    ChangeControllingTeam(Team.Red);
-                }
+                ChangeControllingTeam(Team.Red);
             }
         }
     }

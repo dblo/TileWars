@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -18,10 +15,13 @@ public class GameManager : MonoBehaviour
     private const float MIN_SWIPE_TIME = 0.2f;
     private float swipeStartTime = -1;
 
-    private static GameManager instance;
+    private static GameManager instance = null;
 
     private void Awake()
     {
+        if (instance != null)
+            throw new System.Exception("GameManager can nly exist on a single GameObject");
+
         instance = this;
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
     }
@@ -37,9 +37,6 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         gameBoard = FindObjectOfType<GameBoard>();
-        // Copy scale and pos from gameBoard so that the GameManager collider covers the entire board
-        //transform.localScale = new Vector3(gameBoard.GetColsCount(), gameBoard.GetRowsCount());
-        //transform.position = new Vector3(gameBoard.GetColsCount() / 2f, gameBoard.GetRowsCount() / 2f, -1);
         p1 = GameObject.Find("Player").GetComponent<Player>();
 
         var p2GO = GameObject.Find("AIPlayer");
@@ -99,9 +96,6 @@ public class GameManager : MonoBehaviour
 
     private void RunCombatLogic()
     {
-        //if (contestedTiles.Count == 0)
-        //    return;
-                
         foreach (var army in p2.GetArmies())
         {
             if(army.IsInCombat())
@@ -125,7 +119,7 @@ public class GameManager : MonoBehaviour
                 armiesPendingRemoval.Add(army);
             }
         }
-
+        p1.OnEnemiesKilled(armiesPendingRemoval);
         p2.KillArmies(armiesPendingRemoval);
         armiesPendingRemoval.Clear();
 
@@ -136,6 +130,7 @@ public class GameManager : MonoBehaviour
                 armiesPendingRemoval.Add(army);
             }
         }
+        p2.OnEnemiesKilled(armiesPendingRemoval);
         p1.KillArmies(armiesPendingRemoval);
         armiesPendingRemoval.Clear();
     }
@@ -157,8 +152,6 @@ public class GameManager : MonoBehaviour
     {
         if (ArmySelected())
         {
-            //var worldCoord = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            //selectedArmy.MoveTo(worldCoord);
             ClearArmySelection();
         }
     }

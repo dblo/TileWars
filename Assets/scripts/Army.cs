@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UI;
@@ -14,6 +16,7 @@ public class Army : MonoBehaviour {
     private List<Army> enemiesInRange = new List<Army>();
     private List<Army> collidingEnemies = new List<Army>();
     private List<Vector2> currentTravelPath = new List<Vector2>();
+    private List<Tile> presenetInTiles = new List<Tile>();
     protected Transform rangeDisplay;
 
     #region Combat Stats
@@ -95,6 +98,30 @@ public class Army : MonoBehaviour {
         UpdatePower();
         OnRangeChanged(range);
         UpdateText();
+    }
+
+    internal void OnEnteredTile(Tile tile)
+    {
+        presenetInTiles.Add(tile);
+    }
+
+    internal void OnExitedTile(Tile tile)
+    {
+        presenetInTiles.Remove(tile);
+    }
+
+    private void OnDestroy()
+    {
+        foreach (var tile in presenetInTiles)
+        {
+            tile.RemoveOccupant(this);
+        }
+    }
+
+    internal void OnEnemiesKilled(List<Army> armiesPendingRemoval)
+    {
+        enemiesInRange = enemiesInRange.Except(armiesPendingRemoval).ToList();
+        collidingEnemies = collidingEnemies.Except(armiesPendingRemoval).ToList();
     }
 
     protected virtual void OnRangeChanged(float aRange)
