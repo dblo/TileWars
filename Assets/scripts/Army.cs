@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -7,7 +6,8 @@ using UnityEngine.UI;
 
 public enum Team { Red, Blue, Neutral };
 
-public class Army : MonoBehaviour {
+public class Army : MonoBehaviour
+{
     private const double REACHED_WAYPOINT_DISTANCE = .05;
     [SerializeField]
     protected Team team;
@@ -18,6 +18,7 @@ public class Army : MonoBehaviour {
     private List<Vector2> currentTravelPath = new List<Vector2>();
     private List<Tile> presenetInTiles = new List<Tile>();
     protected Transform rangeDisplay;
+    protected bool inHill;
 
     #region Combat Stats
     private int power;
@@ -84,7 +85,7 @@ public class Army : MonoBehaviour {
     {
         foreach (Transform trans in transform)
         {
-            if(trans.name == "RangeDisplay")
+            if (trans.name == "RangeDisplay")
             {
                 rangeDisplay = trans;
                 break;
@@ -96,18 +97,57 @@ public class Army : MonoBehaviour {
     private void Start()
     {
         UpdatePower();
-        OnRangeChanged(range);
+        OnRangeChanged();
         UpdateText();
     }
 
     internal void OnEnteredTile(Tile tile)
     {
         presenetInTiles.Add(tile);
+
+        switch (tile.GetTileType())
+        {
+            case TileType.Plains:
+                break;
+            case TileType.Hill:
+                SetInHill(true);
+                break;
+            case TileType.Mountain:
+                break;
+            default:
+                break;
+        }
     }
 
     internal void OnExitedTile(Tile tile)
     {
         presenetInTiles.Remove(tile);
+
+        switch (tile.GetTileType())
+        {
+            case TileType.Plains:
+                break;
+            case TileType.Hill:
+                SetInHill(false);
+                break;
+            case TileType.Mountain:
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void SetInHill(bool val)
+    {
+        inHill = val;
+        OnRangeChanged();
+    }
+
+    protected virtual float GetEffectiveRange()
+    {
+        if (inHill)
+            return range * 1.5f;
+        return range;
     }
 
     private void OnDestroy()
@@ -124,11 +164,12 @@ public class Army : MonoBehaviour {
         collidingEnemies = collidingEnemies.Except(armiesPendingRemoval).ToList();
     }
 
-    protected virtual void OnRangeChanged(float aRange)
+    protected virtual void OnRangeChanged()
     {
+        var effectveRange = GetEffectiveRange();
         var coll = transform.Find("RangeManager").GetComponent<CircleCollider2D>();
-        coll.radius = aRange;
-        rangeDisplay.localScale = new Vector3(aRange, aRange);
+        coll.radius = effectveRange;
+        rangeDisplay.localScale = new Vector3(effectveRange, effectveRange);
     }
 
     internal void RandomizeStats()
@@ -168,7 +209,7 @@ public class Army : MonoBehaviour {
         inCombat = true;
     }
 
-    void FixedUpdate ()
+    void FixedUpdate()
     {
         if (currentTravelPath.Count > 0 && collidingEnemies.Count == 0)
         {
@@ -179,7 +220,7 @@ public class Army : MonoBehaviour {
                 currentTravelPath.RemoveAt(0);
             }
         }
-	}
+    }
 
     internal void OnEnemyOutOfRange(Army army)
     {
@@ -203,7 +244,7 @@ public class Army : MonoBehaviour {
 
     internal void DoCombat()
     {
-        if(enemiesInRange.Count > 0)
+        if (enemiesInRange.Count > 0)
         {
             Assert.IsTrue(enemiesInRange[0] != null);
             Attack(enemiesInRange[0]);
@@ -216,7 +257,7 @@ public class Army : MonoBehaviour {
         enemy.UpdateText();
         //Debug.Log(team + " attacked: " + attackDamage + "dmg. " + enemy.team + " hp: " + enemy.armySize);
     }
-    
+
     private void UpdateText()
     {
         powerText.text = GetPower();
@@ -241,7 +282,7 @@ public class Army : MonoBehaviour {
     private void OnCollisionEnter2D(Collision2D collision)
     {
         var army = collision.collider.GetComponent<Army>();
-        if(army != null && IsEnemy(army))
+        if (army != null && IsEnemy(army))
         {
             collidingEnemies.Add(army);
         }
@@ -261,6 +302,28 @@ public class Army : MonoBehaviour {
         if (army != null && IsEnemy(army))
         {
             collidingEnemies.Remove(army);
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        var tile = collision.GetComponent<Tile>();
+        if (tile != null)
+        {
+            tile.AddOccupant(this);
+            OnEnteredTile(tile);
+            return;
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        var tile = collision.GetComponent<Tile>();
+        if (tile != null)
+        {
+            tile.RemoveOccupant(this);
+            OnExitedTile(tile);
+            return;
         }
     }
 }

@@ -2,10 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum TileType { Plains, Hill, Mountain };
+
 public class Tile : MonoBehaviour {
     private List<Army> redOccupants = new List<Army>();
     private List<Army> blueOccupants = new List<Army>();
     private Team controllingTeam = Team.Neutral;
+    [SerializeField]
+    private TileType tileType;
 
     internal int GetScoreValue()
     {
@@ -15,6 +19,11 @@ public class Tile : MonoBehaviour {
     internal int GetCashValue()
     {
         return 1;
+    }
+
+    internal TileType GetTileType()
+    {
+        return tileType;
     }
 
     public bool IsContested()

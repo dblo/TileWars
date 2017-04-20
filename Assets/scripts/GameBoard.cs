@@ -12,6 +12,8 @@ public class GameBoard : MonoBehaviour {
     [SerializeField]
     private GameObject plainsPrefab;
     [SerializeField]
+    private GameObject hillPrefab;
+    [SerializeField]
     private GameObject wallPrefab;
 
     void Start () {
@@ -20,11 +22,17 @@ public class GameBoard : MonoBehaviour {
         {
             for(int j = 0; j < boardCols; ++j)
             {
-                var newTile = Instantiate(plainsPrefab, transform);
+                GameObject newTile;
+                if(i!=j)
+                    newTile = Instantiate(plainsPrefab, transform);
+                else
+                    newTile = Instantiate(hillPrefab, transform);
+
                 newTile.transform.position += new Vector3(j, i, 0);
                 tiles.Add(newTile.GetComponent<Tile>());
             }
         }
+
         var leftWall = Instantiate(wallPrefab, transform);
         leftWall.transform.localScale = new Vector3(1, boardRows);
         leftWall.transform.position = transform.position + new Vector3(-1f, 2.5f);

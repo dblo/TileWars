@@ -17,6 +17,7 @@ public class Artillery : Army
 
     private const float SHELL_LIFETIME = 0.7f;
     private const float DEPLOY_TIME = 4f;
+    private bool inBombardMode;
 
     protected override void Awake()
     {
@@ -77,10 +78,8 @@ public class Artillery : Army
 
     private void SetBombardMode(bool val)
     {
-        if (val)
-            OnRangeChanged(bombardRange);
-        else
-            OnRangeChanged(range);
+        inBombardMode = val;
+        OnRangeChanged();
     }
 
     public override void ChangeTravelPath(List<Vector2> swipePath)
@@ -88,5 +87,13 @@ public class Artillery : Army
         SetBombardMode(false);
         deplomentTimer = DEPLOY_TIME;
         base.ChangeTravelPath(swipePath);
+    }
+
+    protected override float GetEffectiveRange()
+    {
+        float eRange;
+        eRange = inBombardMode ? bombardRange : range;
+        eRange = inHill ? eRange * 1.5f : eRange;
+        return eRange;
     }
 }

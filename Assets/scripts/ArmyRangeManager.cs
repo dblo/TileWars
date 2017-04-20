@@ -4,45 +4,24 @@ public class ArmyRangeManager : MonoBehaviour {
     private Army army;
 
 	void Awake () {
-        army = transform.GetComponent<Army>();
+        army = transform.GetComponentInParent<Army>();
 	}
 
-    internal Army GetArmy()
-    {
-        return army;
-    }
-    
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        var tile = collision.GetComponent<Tile>();
-        if (tile != null)
-        {
-            tile.AddOccupant(army);
-            army.OnEnteredTile(tile);
-            return;
-        }
-
-        var enemy = collision.GetComponent<ArmyRangeManager>();
-        if(enemy != null && army.IsEnemy(enemy.army)) {
-            army.OnEnemyInRange(enemy.army);
+        var enemy = collision.GetComponent<Army>();
+        if(enemy != null && army.IsEnemy(enemy)) {
+            army.OnEnemyInRange(enemy);
             return;
         }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        var tile = collision.GetComponent<Tile>();
-        if (tile != null)
+        var enemy = collision.GetComponent<Army>();
+        if (enemy != null && army.IsEnemy(enemy))
         {
-            tile.RemoveOccupant(army);
-            army.OnExitedTile(tile);
-            return;
-        }
-
-        var enemy = collision.GetComponent<ArmyRangeManager>();
-        if (enemy != null && army.IsEnemy(enemy.army))
-        {
-            army.OnEnemyOutOfRange(enemy.army);
+            army.OnEnemyOutOfRange(enemy);
             return;
         }
     }
