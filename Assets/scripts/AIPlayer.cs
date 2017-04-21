@@ -48,7 +48,8 @@ public class AIPlayer : Player {
     protected override void SpawnArmy(Vector2 spawnPoint, GameObject prefab)
     {
         base.SpawnArmy(spawnPoint, prefab);
-        armies[armies.Count - 1].RandomizeStats();
+        //armies[armies.Count - 1].RandomizeStats();
+        armies[armies.Count - 1].SetLevel(0);
     }
 
     private void MoveArmies()

@@ -16,9 +16,9 @@ public class Army : MonoBehaviour
     private List<Army> enemiesInRange = new List<Army>();
     private List<Army> collidingEnemies = new List<Army>();
     private List<Vector2> currentTravelPath = new List<Vector2>();
-    private List<Tile> presenetInTiles = new List<Tile>();
     protected Transform rangeDisplay;
     protected bool inHill;
+    Tile nowInTile;
 
     #region Combat Stats
     private int power;
@@ -103,7 +103,8 @@ public class Army : MonoBehaviour
 
     internal void OnEnteredTile(Tile tile)
     {
-        presenetInTiles.Add(tile);
+        nowInTile = tile;
+        nowInTile.AddOccupant(this);
 
         switch (tile.GetTileType())
         {
@@ -119,11 +120,13 @@ public class Army : MonoBehaviour
         }
     }
 
-    internal void OnExitedTile(Tile tile)
+    internal void OnExitedTile()
     {
-        presenetInTiles.Remove(tile);
+        if (nowInTile == null)
+            return;
 
-        switch (tile.GetTileType())
+        nowInTile.RemoveOccupant(this);
+        switch (nowInTile.GetTileType())
         {
             case TileType.Plains:
                 break;
@@ -135,6 +138,7 @@ public class Army : MonoBehaviour
             default:
                 break;
         }
+        nowInTile = null;
     }
 
     private void SetInHill(bool val)
@@ -152,10 +156,7 @@ public class Army : MonoBehaviour
 
     private void OnDestroy()
     {
-        foreach (var tile in presenetInTiles)
-        {
-            tile.RemoveOccupant(this);
-        }
+        nowInTile.RemoveOccupant(this);
     }
 
     internal void OnEnemiesKilled(List<Army> armiesPendingRemoval)
@@ -179,6 +180,12 @@ public class Army : MonoBehaviour
         speed = UnityEngine.Random.Range(0.01f, 0.04f);
         range = UnityEngine.Random.Range(0.5f, 1f);
         UpdatePower();
+    }
+
+    internal void SetLevel(int level)
+    {
+        attackDamage = 2;
+        armySize = 10;
     }
 
     internal void ChangeTeam(Team newTeam)
@@ -310,20 +317,8 @@ public class Army : MonoBehaviour
         var tile = collision.GetComponent<Tile>();
         if (tile != null)
         {
-            tile.AddOccupant(this);
+            OnExitedTile();
             OnEnteredTile(tile);
-            return;
-        }
-    }
-
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        var tile = collision.GetComponent<Tile>();
-        if (tile != null)
-        {
-            tile.RemoveOccupant(this);
-            OnExitedTile(tile);
-            return;
         }
     }
 }
