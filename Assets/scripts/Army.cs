@@ -218,7 +218,7 @@ public class Army : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (currentTravelPath.Count > 0 && collidingEnemies.Count == 0)
+        if (currentTravelPath.Count > 0)// && collidingEnemies.Count == 0)
         {
             var newPos = Vector2.MoveTowards(transform.position, GetNextWaypoint(), GetSpeed());
             transform.position = newPos;
@@ -297,7 +297,7 @@ public class Army : MonoBehaviour
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        if (collision.gameObject.name == "Wall(Clone)") // TODO improve
+        if (collision.gameObject.name == "Wall") // TODO improve
         {
             RemoveUnreachableWaypoint();
         }

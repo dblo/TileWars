@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using UnityEngine;
 
 public class GameBoard : MonoBehaviour {
@@ -15,39 +16,27 @@ public class GameBoard : MonoBehaviour {
     private GameObject hillPrefab;
     [SerializeField]
     private GameObject wallPrefab;
+    [SerializeField]
+
+    private void Awake()
+    {
+        tiles = new List<Tile>(boardRows * boardCols);
+    }
 
     void Start () {
-        tiles = new List<Tile>(boardRows * boardCols);
-        for(int i = 0 ; i < boardRows; ++i)
+        foreach (Transform trans in transform)
         {
-            for(int j = 0; j < boardCols; ++j)
+            var tile = trans.GetComponent<Tile>();
+            if (tile)
             {
-                GameObject newTile;
-                if(i!=j)
-                    newTile = Instantiate(plainsPrefab, transform);
-                else
-                    newTile = Instantiate(hillPrefab, transform);
-
-                newTile.transform.position += new Vector3(j, i, 0);
-                tiles.Add(newTile.GetComponent<Tile>());
+                int col = (int)trans.position.x;
+                int row = (int)trans.position.y;
+                tiles.Add(tile);
+                //tiles.Insert(row * GetColsCount() + col, tile);
             }
         }
 
-        var leftWall = Instantiate(wallPrefab, transform);
-        leftWall.transform.localScale = new Vector3(1, boardRows);
-        leftWall.transform.position = transform.position + new Vector3(-1f, 2.5f);
-
-        var rightWall = Instantiate(wallPrefab, transform);
-        rightWall.transform.localScale = new Vector3(1, boardRows);
-        rightWall.transform.position += new Vector3(boardCols, 2.5f);
-
-        var upperWall = Instantiate(wallPrefab, transform);
-        upperWall.transform.position += new Vector3(-0.5f + boardCols / 2f, boardRows);
-        upperWall.transform.localScale = new Vector3(boardCols + 2, 1);
-
-        var lowerWall = Instantiate(wallPrefab, transform);
-        lowerWall.transform.position += new Vector3(-0.5f + boardCols / 2f, -1);
-        lowerWall.transform.localScale = new Vector3(boardCols + 2, 1);
+        tiles = tiles.OrderBy(y => y.transform.position.y).ThenBy(x => x.transform.position.x).ToList();
     }
 
     internal int GetColsCount()
