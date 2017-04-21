@@ -75,8 +75,8 @@ public class GameManager : MonoBehaviour
 
     private void UpdateCashScore()
     {
-        var tiles = gameBoard.GetTiles();
-        foreach (Tile tile in tiles)
+        var tiles = gameBoard.GetTraversableTiles();
+        foreach (TraversableTile tile in tiles)
         {
             switch (tile.ControlledBy())
             {

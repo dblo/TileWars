@@ -18,7 +18,7 @@ public class Army : MonoBehaviour
     private List<Vector2> currentTravelPath = new List<Vector2>();
     protected Transform rangeDisplay;
     protected bool inHill;
-    Tile nowInTile;
+    TraversableTile nowInTile;
 
     #region Combat Stats
     private int power;
@@ -101,7 +101,7 @@ public class Army : MonoBehaviour
         UpdateText();
     }
 
-    internal void OnEnteredTile(Tile tile)
+    internal void OnEnteredTile(TraversableTile tile)
     {
         nowInTile = tile;
         nowInTile.AddOccupant(this);
@@ -238,7 +238,7 @@ public class Army : MonoBehaviour
         }
     }
 
-    internal void MoveTo(Tile tile)
+    internal void MoveTo(TraversableTile tile)
     {
         MoveTo(tile.transform.position);
     }
@@ -301,6 +301,10 @@ public class Army : MonoBehaviour
         {
             RemoveUnreachableWaypoint();
         }
+        else if(collision.gameObject.GetComponent<Tile>() != null)
+        {
+            RemoveUnreachableWaypoint();
+        }
     }
 
     private void OnCollisionExit2D(Collision2D collision)
@@ -314,7 +318,7 @@ public class Army : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        var tile = collision.GetComponent<Tile>();
+        var tile = collision.GetComponent<TraversableTile>();
         if (tile != null)
         {
             OnExitedTile();

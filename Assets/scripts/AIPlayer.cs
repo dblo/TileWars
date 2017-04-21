@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class AIPlayer : Player {
-	private int logicCounter;
+public class AIPlayer : Player
+{
+    private int logicCounter;
     private GameBoard gameBoard;
 
     override protected void Start()
@@ -11,7 +12,8 @@ public class AIPlayer : Player {
         gameBoard = FindObjectOfType<GameBoard>();
     }
 
-    void Update () {
+    void Update()
+    {
         logicCounter--;
         if (logicCounter <= 0)
         {
@@ -56,12 +58,16 @@ public class AIPlayer : Player {
     {
         foreach (var army in armies)
         {
-            if (army != null && !army.IsInCombat() && army.IsStationary())
+            if (!army.IsInCombat() && army.IsStationary())
             {
-                var col = Random.Range(0, gameBoard.GetColsCount()-1);
-                var row = Random.Range(0, gameBoard.GetRowsCount()-1);
-                Tile tile = gameBoard.GetTile(row, col);
-                army.MoveTo(tile);
+                TraversableTile nextDesination = null;
+                while (nextDesination == null)
+                {
+                    var col = Random.Range(0, gameBoard.GetColsCount() - 1);
+                    var row = Random.Range(0, gameBoard.GetRowsCount() - 1);
+                    nextDesination = gameBoard.GetTile(row, col);
+                }
+                army.MoveTo(nextDesination);
             }
         }
     }
