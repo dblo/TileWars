@@ -16,7 +16,7 @@ public class Artillery : Army
     private float deplomentTimer = 0;
 
     private const float SHELL_LIFETIME = 0.7f;
-    private const float DEPLOY_TIME = 4f;
+    private const float DEPLOY_TIME = 3f;
     private bool inBombardMode;
 
     protected override void Awake()
