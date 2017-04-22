@@ -25,12 +25,12 @@ public class Player : MonoBehaviour
 
     private void Awake()
     {
+        armies = new List<Army>(maxArmyCount);
+        SpawnArmies();
     }
 
     virtual protected void Start()
     {
-        armies = new List<Army>(maxArmyCount);
-        SpawnArmies();
     }
 
     public ReadOnlyCollection<Army> GetArmies()

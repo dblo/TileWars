@@ -52,10 +52,18 @@ public class GameManager : MonoBehaviour
         p1 = GameObject.Find("Player").GetComponent<Player>();
 
         var p2GO = GameObject.Find("AIPlayer");
-        if(p2GO != null)
+        if (p2GO != null)
             p2 = p2GO.GetComponent<Player>();
 
         nextMousePoll = Time.time;
+        SetInitialSelection();
+    }
+
+    private void SetInitialSelection()
+    {
+        var p1Armies = p1.GetArmies();
+        if (p1Armies.Count > 0)
+            OnArmyClicked(p1Armies[0]);
     }
 
     private void Update()
@@ -181,14 +189,6 @@ public class GameManager : MonoBehaviour
     internal void OnTileClicked(Tile tile)
     {
         if (ArmySelected())
-        {
-            ClearArmySelection();
-        }
-    }
-
-    internal void OnHQClicked()
-    {
-        if (selectedArmy)
         {
             ClearArmySelection();
         }
