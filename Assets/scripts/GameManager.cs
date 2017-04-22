@@ -238,6 +238,9 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetMouseButton(0))
         {
+            if (!MouseOverGameBoard())
+                return;
+
             if (swipeStartTime < 0)
             {
                 swipeStartTime = Time.time;
@@ -254,6 +257,14 @@ public class GameManager : MonoBehaviour
             swipeStartTime = -1;
             return;
         }
+    }
+
+    private bool MouseOverGameBoard()
+    {
+        var pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        return pos.x >= 0 && pos.y >= 0 &&
+            pos.x < gameBoard.GetColsCount() &&
+            pos.y < gameBoard.GetRowsCount();
     }
 
     public void TryUpgradeSelected()
