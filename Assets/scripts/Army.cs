@@ -26,19 +26,19 @@ public abstract class Army : MonoBehaviour, ISelectableObject
     TraversableTile nowInTile;
     protected int rank = 0; // Shown as rank+1 in-game
 
-    private static List<int> upgradeCostLevels = new List<int> { 0, 100, 500, 1000 };
+    private static List<int> upgradeCostLevels = new List<int> { 100, 500, 1000 };
     private static List<int> purchaseCostLevels = new List<int> { 100, 200, 400, 800 };
     
     #region Combat Stats
     private int power;
     [SerializeField]
-    protected int attackDamage = 10;
+    protected int attackDamage;
     [SerializeField]
-    protected int hp = 100;
+    protected int hp;
     [SerializeField]
-    protected float speed = 0.03f;
+    protected float speed;
     [SerializeField]
-    protected float range = 0.5f;
+    protected float range;
     #endregion
 
     #region Getters/Setters/Predicates
@@ -399,7 +399,7 @@ public abstract class Army : MonoBehaviour, ISelectableObject
         SetShowRangeDisplay(false);
     }
 
-    public abstract string GetDescriptor();
+    public abstract string GetUpgradeDescriptor();
 
     internal static int UpgradeCost(int rank)
     {
@@ -408,10 +408,10 @@ public abstract class Army : MonoBehaviour, ISelectableObject
         return upgradeCostLevels[rank];
     }
 
-    internal int PurchaseCost(int rank)
+    internal static int PurchaseCost(int rank)
     {
-        if (UpgradeMaxed())
-            return purchaseCostLevels[upgradeCostLevels.Count - 1];
+        if (rank >= purchaseCostLevels.Count - 1)
+            return purchaseCostLevels.Last();
         return purchaseCostLevels[rank];
     }
 

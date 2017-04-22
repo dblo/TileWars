@@ -2,5 +2,5 @@
 {
     void Select();
     void Deselect();
-    string GetDescriptor();
+    string GetUpgradeDescriptor();
 }

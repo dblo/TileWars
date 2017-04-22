@@ -28,7 +28,7 @@ public class Tile : MonoBehaviour, ISelectableObject
         GameManager.Get().OnSelection(this);
     }
 
-    public string GetDescriptor()
+    public string GetUpgradeDescriptor()
     {
         switch (tileType)
         {

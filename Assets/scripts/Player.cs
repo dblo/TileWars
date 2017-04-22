@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
@@ -20,6 +21,10 @@ public class Player : MonoBehaviour
     [SerializeField]
     private Team team;
 
+    Text buyInfantryText;
+    Text buyCavalryText;
+    Text buyArtilleryText;
+
     // Mapped to by ArmyType for 0=Infantry, 1=Cavalry, 2=Artillery
     List<int> armyRanks = new List<int> { 0, 0, 0 };
     public bool cheater; //debug
@@ -27,7 +32,17 @@ public class Player : MonoBehaviour
     private void Awake()
     {
         armies = new List<Army>(maxArmyCount);
+        buyInfantryText = GameObject.Find("BuyInfantryText").GetComponent<Text>();
+        buyCavalryText = GameObject.Find("BuyCavalryText").GetComponent<Text>();
+        buyArtilleryText = GameObject.Find("BuyArtilleryText").GetComponent<Text>();
         SpawnArmies();
+    }
+
+    protected virtual void Start()
+    {
+        UpdateBuyText(ArmyType.Infantry, armyRanks[(int)ArmyType.Infantry]);
+        //UpdateBuyText(ArmyType.Cavalry, armyRanks[(int)ArmyType.Cavalry]);
+        UpdateBuyText(ArmyType.Artillery, armyRanks[(int)ArmyType.Artillery]);
     }
 
     public ReadOnlyCollection<Army> GetArmies()
@@ -60,20 +75,25 @@ public class Player : MonoBehaviour
         switch (type)
         {
             case ArmyType.Infantry:
-                if (cash >= 50)
+                if (cash >= Army.PurchaseCost(GetInfantryRank()))
                 {
                     SpawnArmy(GetSpawnPoint(), infantryPrefab);
-                    cash -= 50;
+                    cash -= Army.PurchaseCost(GetInfantryRank());
                 }
                 break;
+            //case ArmyType.Cavalry:
+            //    if (cash >= Army.PurchaseCost(GetCavalryRank()))
+            //    {
+            //        SpawnArmy(GetSpawnPoint(), );
+            //        cash -= Army.PurchaseCost(GetCavalryRank()));
+            //    }
+            //    break;
             case ArmyType.Artillery:
-                if (cash >= 100)
+                if (cash >= Army.PurchaseCost(GetArtilleryRank()))
                 {
                     SpawnArmy(GetSpawnPoint(), artilleryPrefab);
-                    cash -= 100;
+                    cash -= Army.PurchaseCost(GetArtilleryRank());
                 }
-                break;
-            case ArmyType.Cavalry:
                 break;
             default:
                 throw new System.ArgumentException();
@@ -147,11 +167,28 @@ public class Player : MonoBehaviour
             Upgrade(armyType);
             cash -= upgradeCost;
             armyRanks[(int)armyType]++;
+            UpdateBuyText(armyType, armyRanks[(int)armyType]);
             return true;
         }
         return false;
     }
 
+    private void UpdateBuyText(ArmyType armyType, int armyRank)
+    {
+        switch (armyType)
+        {
+            case ArmyType.Infantry:
+                buyInfantryText.text = "Buy\nI" + (armyRank + 1) + "-$" + Army.PurchaseCost(armyRank).ToString();
+                return;
+            case ArmyType.Cavalry:
+                break;
+            case ArmyType.Artillery:
+                buyArtilleryText.text = "Buy\nA" + (armyRank + 1) + "-$" + Army.PurchaseCost(armyRank).ToString();
+                return;
+        }
+        throw new ArgumentException();
+    }
+    
     private void Upgrade(ArmyType armyType)
     {
         foreach (var army in armies)
@@ -159,5 +196,20 @@ public class Player : MonoBehaviour
             if (army.IsType(armyType))
                 army.Upgrade();
         }
+    }
+
+    private int GetInfantryRank()
+    {
+        return armyRanks[(int)ArmyType.Infantry];
+    }
+
+    private int GetCavalryRank()
+    {
+        return armyRanks[(int)ArmyType.Cavalry];
+    }
+
+    private int GetArtilleryRank()
+    {
+        return armyRanks[(int)ArmyType.Artillery];
     }
 }

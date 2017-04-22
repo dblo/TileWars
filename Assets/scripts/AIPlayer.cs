@@ -6,7 +6,7 @@ public class AIPlayer : Player
     private int logicCounter;
     private GameBoard gameBoard;
 
-    protected void Start()
+    protected override void Start()
     {
         gameBoard = FindObjectOfType<GameBoard>();
     }

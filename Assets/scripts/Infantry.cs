@@ -8,13 +8,27 @@ public class Infantry : Army
     private static List<int> attackDamageLevels = new List<int> { 1, 2, 4, 8 };
     private static List<int> hpLevels = new List<int> { 4, 8, 12, 16 };
     private static List<float> speedLevels = new List<float> { 0.02f, 0.03f};
-    private static List<float> rangeLevels = new List<float> { 0.5f, 0.75f, 1f, 1.25f };
+    private static List<float> rangeLevels = new List<float> { 0.6f, 0.8f, 1f, 1.25f };
 
-    public override string GetDescriptor()
+    protected override void Awake()
+    {
+        base.Awake();
+        attackDamage = attackDamageLevels[0];
+        hp = hpLevels[0];
+        speed = speedLevels[0];
+        range = rangeLevels[0];
+    }
+
+    public override string GetUpgradeDescriptor()
     {
         if (UpgradeMaxed())
             return "I MAX";
-        return "I" + (rank + 1) + "-$" + UpgradeCost(rank + 1);
+        return "I" + (rank + 1) + "-$" + UpgradeCost(rank);
+    }
+
+    internal override bool IsType(ArmyType type)
+    {
+        return ArmyType.Infantry == type;
     }
 
     protected override ReadOnlyCollection<int> GetAttackDamageLevels()
@@ -35,10 +49,5 @@ public class Infantry : Army
     protected override ReadOnlyCollection<float> GetRangeLevels()
     {
         return rangeLevels.AsReadOnly();
-    }
-
-    internal override bool IsType(ArmyType type)
-    {
-        return ArmyType.Infantry == type;
     }
 }

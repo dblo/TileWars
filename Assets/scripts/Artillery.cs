@@ -101,7 +101,7 @@ public class Artillery : Army
         OnRangeChanged();
     }
 
-    public override string GetDescriptor()
+    public override string GetUpgradeDescriptor()
     {
         if (UpgradeMaxed())
             return "A MAX";

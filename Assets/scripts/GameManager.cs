@@ -204,7 +204,7 @@ public class GameManager : MonoBehaviour
 
     private void UpdateUpgradeText()
     {
-        upgradeText.text = "Upgrade\n" + selectedObject.GetDescriptor();
+        upgradeText.text = "Upgrade\n" + selectedObject.GetUpgradeDescriptor();
     }
 
     private void ClearSelection()
