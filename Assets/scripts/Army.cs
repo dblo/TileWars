@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -6,7 +7,7 @@ using UnityEngine.UI;
 
 public enum Team { Red, Blue, Neutral };
 
-public class Army : MonoBehaviour
+public class Army : MonoBehaviour, ISelectableObject
 {
     private const double REACHED_WAYPOINT_DISTANCE = .05;
     [SerializeField]
@@ -63,7 +64,7 @@ public class Army : MonoBehaviour
         return power.ToString();
     }
 
-    public virtual void SetShowRangeDisplay(bool val)
+    private void SetShowRangeDisplay(bool val)
     {
         rangeDisplay.gameObject.SetActive(val);
     }
@@ -278,7 +279,7 @@ public class Army : MonoBehaviour
 
     protected virtual void OnMouseDown()
     {
-        GameManager.Get().OnArmyClicked(this);
+        GameManager.Get().OnSelection(this);
     }
 
     public virtual void ChangeTravelPath(List<Vector2> swipePath)
@@ -324,5 +325,15 @@ public class Army : MonoBehaviour
             OnExitedTile();
             OnEnteredTile(tile);
         }
+    }
+
+    public void Select()
+    {
+        SetShowRangeDisplay(true);
+    }
+
+    public void Deselect()
+    {
+        SetShowRangeDisplay(false);
     }
 }

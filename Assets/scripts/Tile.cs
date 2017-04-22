@@ -1,12 +1,23 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public enum TileType { Plains, Hill, Mountain, Water };
 
-public class Tile : MonoBehaviour
+public class Tile : MonoBehaviour, ISelectableObject
 {
     [SerializeField]
     private TileType tileType;
 
+    public void Select()
+    {
+        //Activate selected overlay
+    }
+
+    public void Deselect()
+    {
+        //deactivate selected overlay
+    }
+    
     internal TileType GetTileType()
     {
         return tileType;
@@ -14,6 +25,6 @@ public class Tile : MonoBehaviour
 
     private void OnMouseDown()
     {
-        GameManager.Get().OnTileClicked(this);
+        GameManager.Get().OnSelection(this);
     }
 }

@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {
     private GameBoard gameBoard;
-    private Army selectedArmy;
+    private ISelectableObject selectedObject;
     private int logicCounter;
     private const int LOGIC_TICKS = 50;
     private Player p1;
@@ -63,15 +63,16 @@ public class GameManager : MonoBehaviour
     {
         var p1Armies = p1.GetArmies();
         if (p1Armies.Count > 0)
-            OnArmyClicked(p1Armies[0]);
+            OnSelection(p1Armies[0]);
     }
 
     private void Update()
     {
-        if(nextMousePoll <= Time.time)
+        if (nextMousePoll <= Time.time)
         {
             nextMousePoll = Time.time + MOUSE_POLL_RATE;
-            HandleMouseGesture();
+            if (ArmySelected())
+                ProcessGesturForSelectedArmy();
         }
     }
 
@@ -81,7 +82,7 @@ public class GameManager : MonoBehaviour
         {
             logicCounter = LOGIC_TICKS;
 
-            if(p2 && p1)
+            if (p2 && p1)
             {
                 RunCombatLogic();
                 UpdateCashScore();
@@ -136,7 +137,7 @@ public class GameManager : MonoBehaviour
     {
         foreach (var army in p2.GetArmies())
         {
-            if(army.IsInCombat())
+            if (army.IsInCombat())
             {
                 army.DoCombat();
             }
@@ -173,43 +174,39 @@ public class GameManager : MonoBehaviour
         armiesPendingRemoval.Clear();
     }
 
-    internal void OnArmyClicked(Army army)
+    internal void OnSelection(ISelectableObject obj)
     {
-        if (selectedArmy == army)
+        if (selectedObject == obj)
             return;
-
-        if (selectedArmy)
-        {
-            ClearArmySelection();
-        }
-        selectedArmy = army;
-        selectedArmy.SetShowRangeDisplay(true);
+        ClearSelection();
+        selectedObject = obj;
+        selectedObject.Select();
     }
 
-    internal void OnTileClicked(Tile tile)
+    private void ClearSelection()
     {
-        if (ArmySelected())
-        {
-            ClearArmySelection();
-        }
+        if (HasSelection())
+            selectedObject.Deselect();
+        selectedObject = null;
+    }
+
+    internal void OnBackgroundClicked()
+    {
+        ClearSelection();
+    }
+
+    private bool HasSelection()
+    {
+        return selectedObject != null;
     }
 
     private bool ArmySelected()
     {
-        return selectedArmy != null;
+        return selectedObject is Army;
     }
 
-    private void ClearArmySelection()
+    void ProcessGesturForSelectedArmy()
     {
-        selectedArmy.SetShowRangeDisplay(false);
-        selectedArmy = null;
-    }
-
-    void HandleMouseGesture()
-    {
-        if (selectedArmy == null)
-            return;
-
         if (Input.GetMouseButton(0))
         {
             if (swipeStartTime < 0)
@@ -218,11 +215,11 @@ public class GameManager : MonoBehaviour
             }
             swipePath.Add(Camera.main.ScreenToWorldPoint(Input.mousePosition));
         }
-        else if(swipeStartTime > 0)
+        else if (swipeStartTime > 0)
         {
-            if(swipeStartTime + MIN_SWIPE_TIME <= Time.time)
+            if (swipeStartTime + MIN_SWIPE_TIME <= Time.time)
             {
-                selectedArmy.ChangeTravelPath(swipePath);
+                (selectedObject as Army).ChangeTravelPath(swipePath);
             }
             swipePath = new List<Vector2>();
             swipeStartTime = -1;
