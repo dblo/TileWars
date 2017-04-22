@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -15,6 +18,10 @@ public class GameManager : MonoBehaviour
     private const float MIN_SWIPE_TIME = 0.2f;
     private float swipeStartTime = -1;
 
+    private Text p1CashText;
+    private Text p1ScoreText;
+    private Text p2ScoreText;
+
     private static GameManager instance = null;
 
     private void Awake()
@@ -24,6 +31,10 @@ public class GameManager : MonoBehaviour
 
         instance = this;
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
+
+        p1ScoreText = GameObject.Find("PlayerScoreText").GetComponent<Text>();
+        p2ScoreText = GameObject.Find("OpponentScoreText").GetComponent<Text>();
+        p1CashText = GameObject.Find("PlayerCashText").GetComponent<Text>();
     }
 
     // Is this reliable if using callied from other script's Awake()?
@@ -90,8 +101,19 @@ public class GameManager : MonoBehaviour
                     break;
             }
         }
-        p1.UpdateUI();
-        p2.UpdateUI();
+        UpdateUI();
+    }
+
+    private void UpdateUI()
+    {
+        p1CashText.text = "$ " + p1.GetCash();
+        p1ScoreText.text = "P1 " + p1.GetScore();
+        p2ScoreText.text = "P2 " + p1.GetScore();
+    }
+
+    public void RestartLevel()
+    {
+        SceneManager.LoadScene(SceneManager.GetSceneAt(0).name);
     }
 
     private void RunCombatLogic()

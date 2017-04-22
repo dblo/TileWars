@@ -27,7 +27,7 @@ public class AIPlayer : Player
     {
         for (int i = 0; i < maxArmyCount - armies.Count; i++)
         {
-            SpawnArmy(hq.GetSpawnPoint(), GetRandomArmyPrefab());
+            SpawnArmy(GetSpawnPoint(), GetRandomArmyPrefab());
         }
     }
 
@@ -43,7 +43,7 @@ public class AIPlayer : Player
     {
         for (int i = 0; i < maxArmyCount; i++)
         {
-            SpawnArmy(hq.GetSpawnPoint(), GetRandomArmyPrefab());
+            SpawnArmy(GetSpawnPoint(), GetRandomArmyPrefab());
         }
     }
 

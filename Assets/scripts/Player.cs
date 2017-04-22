@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
-public enum ArmyType { Infantry, Artillery };
+public enum ArmyType { Infantry, Artillery, Cavalery };
 
 public class Player : MonoBehaviour
 {
@@ -14,9 +15,6 @@ public class Player : MonoBehaviour
     protected GameObject infantryPrefab;
     [SerializeField]
     protected GameObject artilleryPrefab;
-    [SerializeField]
-    private GameObject hqPrefab;
-    protected HQ hq;
     protected List<Army> armies;
     [SerializeField]
     private int cash;
@@ -27,7 +25,6 @@ public class Player : MonoBehaviour
 
     private void Awake()
     {
-        hq = Instantiate(hqPrefab, transform).GetComponent<HQ>();
     }
 
     virtual protected void Start()
@@ -46,34 +43,55 @@ public class Player : MonoBehaviour
         return cash;
     }
 
-    public void AttemptBuyArmy(ArmyType type)
+    public void AttemptBuyInfantry() {
+        AttemptBuyArmy(ArmyType.Infantry);
+    }
+
+    public void AttemptBuyArtillery()
+    {
+        AttemptBuyArmy(ArmyType.Artillery);
+    }
+
+    public void AttemptBuyCavalry()
+    {
+        AttemptBuyArmy(ArmyType.Cavalery);
+    }
+
+    private void AttemptBuyArmy(ArmyType type)
     {
         switch (type)
         {
             case ArmyType.Infantry:
                 if (cash >= 50)
                 {
-                    SpawnArmy(hq.GetSpawnPoint(), infantryPrefab);
+                    SpawnArmy(GetSpawnPoint(), infantryPrefab);
                     cash -= 50;
                 }
                 break;
             case ArmyType.Artillery:
                 if (cash >= 100)
                 {
-                    SpawnArmy(hq.GetSpawnPoint(), artilleryPrefab);
+                    SpawnArmy(GetSpawnPoint(), artilleryPrefab);
                     cash -= 100;
                 }
+                break;
+            case ArmyType.Cavalery:
                 break;
             default:
                 throw new System.ArgumentException();
         }
     }
 
+    protected Vector2 GetSpawnPoint()
+    {
+        return transform.position;
+    }
+
     protected virtual void SpawnArmies()
     {
         for (int i = 0; i < maxArmyCount; i++)
         {
-            SpawnArmy(hq.GetSpawnPoint(), artilleryPrefab);
+            SpawnArmy(GetSpawnPoint(), artilleryPrefab);
         }
     }
 
@@ -106,9 +124,9 @@ public class Player : MonoBehaviour
             cash = MAX_CASH;
     }
 
-    internal void UpdateUI()
+    internal string GetScore()
     {
-        hq.UpdateUI();
+        return score.ToString();
     }
 
     internal void OnEnemiesKilled(List<Army> armiesPendingRemoval)
