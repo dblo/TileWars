@@ -60,15 +60,21 @@ public class AIPlayer : Player
         {
             if (!army.IsInCombat() && army.IsStationary())
             {
-                TraversableTile nextDesination = null;
-                while (nextDesination == null)
-                {
-                    var col = Random.Range(0, gameBoard.GetColsCount() - 1);
-                    var row = Random.Range(0, gameBoard.GetRowsCount() - 1);
-                    nextDesination = gameBoard.GetTile(row, col);
-                }
+                TraversableTile nextDesination = GetRandomTraversableTile();
                 army.MoveTo(nextDesination);
             }
         }
+    }
+
+    private TraversableTile GetRandomTraversableTile()
+    {
+        TraversableTile nextDesination = null;
+        while (nextDesination == null)
+        {
+            var col = Random.Range(0, gameBoard.GetColsCount());
+            var row = Random.Range(0, gameBoard.GetRowsCount());
+            nextDesination = gameBoard.GetTile(row, col);
+        }
+        return nextDesination;
     }
 }
