@@ -77,21 +77,24 @@ public class Player : MonoBehaviour
             case ArmyType.Infantry:
                 if (cash >= Army.PurchaseCost(GetInfantryRank()))
                 {
-                    SpawnArmy(GetSpawnPoint(), infantryPrefab);
+                    var newArmy = SpawnArmy(GetSpawnPoint(), infantryPrefab);
+                    GameManager.Get().OnSelection(newArmy);
                     cash -= Army.PurchaseCost(GetInfantryRank());
                 }
                 break;
             //case ArmyType.Cavalry:
             //    if (cash >= Army.PurchaseCost(GetCavalryRank()))
             //    {
-            //        SpawnArmy(GetSpawnPoint(), );
+            //        var newArmy = SpawnArmy(GetSpawnPoint(), );
+            //        GameManager.Get().OnSelection(newArmy);
             //        cash -= Army.PurchaseCost(GetCavalryRank()));
             //    }
             //    break;
             case ArmyType.Artillery:
                 if (cash >= Army.PurchaseCost(GetArtilleryRank()))
                 {
-                    SpawnArmy(GetSpawnPoint(), artilleryPrefab);
+                    var newArmy = SpawnArmy(GetSpawnPoint(), artilleryPrefab);
+                    GameManager.Get().OnSelection(newArmy);
                     cash -= Army.PurchaseCost(GetArtilleryRank());
                 }
                 break;
@@ -113,15 +116,16 @@ public class Player : MonoBehaviour
         }
     }
 
-    protected virtual void SpawnArmy(Vector2 spawnPoint, GameObject prefab)
+    protected virtual Army SpawnArmy(Vector2 spawnPoint, GameObject prefab)
     {
         var newArmy = Instantiate(prefab, transform).GetComponent<Army>();
         newArmy.transform.position = spawnPoint;
         newArmy.ChangeTeam(team);
         armies.Add(newArmy);
 
-        if(cheater)
+        if (cheater)
             newArmy.Cheat();
+        return newArmy;
     }
 
     internal void KillArmies(List<Army> toRemove)
@@ -188,7 +192,7 @@ public class Player : MonoBehaviour
         }
         throw new ArgumentException();
     }
-    
+
     private void Upgrade(ArmyType armyType)
     {
         foreach (var army in armies)

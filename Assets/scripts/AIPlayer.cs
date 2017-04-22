@@ -46,10 +46,11 @@ public class AIPlayer : Player
         }
     }
 
-    protected override void SpawnArmy(Vector2 spawnPoint, GameObject prefab)
+    protected override Army SpawnArmy(Vector2 spawnPoint, GameObject prefab)
     {
-        base.SpawnArmy(spawnPoint, prefab);
-        armies[armies.Count - 1].RandomizeStats();
+        var newArmy = base.SpawnArmy(spawnPoint, prefab);
+        newArmy.RandomizeStats();
+        return newArmy;
     }
 
     private void MoveArmies()
