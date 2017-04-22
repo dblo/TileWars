@@ -23,6 +23,7 @@ public class GameManager : MonoBehaviour
     private Text p2ScoreText;
 
     private static GameManager instance = null;
+    private int SCORE_TO_WIN = 10000;
 
     private void Awake()
     {
@@ -101,14 +102,21 @@ public class GameManager : MonoBehaviour
                     break;
             }
         }
+        CheckIfGameOver();
         UpdateUI();
+    }
+
+    private void CheckIfGameOver()
+    {
+        if (p1.GetScore() >= SCORE_TO_WIN || p2.GetScore() >= SCORE_TO_WIN)
+            RestartLevel();
     }
 
     private void UpdateUI()
     {
         p1CashText.text = "$ " + p1.GetCash();
         p1ScoreText.text = "P1 " + p1.GetScore();
-        p2ScoreText.text = "P2 " + p1.GetScore();
+        p2ScoreText.text = "P2 " + p2.GetScore();
     }
 
     public void RestartLevel()

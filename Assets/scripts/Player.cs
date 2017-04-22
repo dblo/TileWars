@@ -124,9 +124,9 @@ public class Player : MonoBehaviour
             cash = MAX_CASH;
     }
 
-    internal string GetScore()
+    internal int GetScore()
     {
-        return score.ToString();
+        return score;
     }
 
     internal void OnEnemiesKilled(List<Army> armiesPendingRemoval)
