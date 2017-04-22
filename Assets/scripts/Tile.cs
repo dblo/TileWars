@@ -27,4 +27,22 @@ public class Tile : MonoBehaviour, ISelectableObject
     {
         GameManager.Get().OnSelection(this);
     }
+
+    public string GetDescriptor()
+    {
+        switch (tileType)
+        {
+            case TileType.Plains:
+                break;
+            case TileType.Hill:
+                break;
+            case TileType.Mountain:
+                break;
+            case TileType.Water:
+                break;
+            default:
+                break;
+        }
+        return "";
+    }
 }

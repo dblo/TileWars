@@ -2,4 +2,5 @@
 {
     void Select();
     void Deselect();
+    string GetDescriptor();
 }

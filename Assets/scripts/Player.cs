@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
-
-public enum ArmyType { Infantry, Artillery, Cavalery };
 
 public class Player : MonoBehaviour
 {
@@ -23,14 +20,14 @@ public class Player : MonoBehaviour
     [SerializeField]
     private Team team;
 
+    // Mapped to by ArmyType for 0=Infantry, 1=Cavalry, 2=Artillery
+    List<int> armyRanks = new List<int> { 0, 0, 0 };
+    public bool cheater; //debug
+
     private void Awake()
     {
         armies = new List<Army>(maxArmyCount);
         SpawnArmies();
-    }
-
-    virtual protected void Start()
-    {
     }
 
     public ReadOnlyCollection<Army> GetArmies()
@@ -43,18 +40,19 @@ public class Player : MonoBehaviour
         return cash;
     }
 
-    public void AttemptBuyInfantry() {
+    public void TryBuyInfantry()
+    {
         AttemptBuyArmy(ArmyType.Infantry);
     }
 
-    public void AttemptBuyArtillery()
+    public void TryBuyArtillery()
     {
         AttemptBuyArmy(ArmyType.Artillery);
     }
 
-    public void AttemptBuyCavalry()
+    public void TryBuyCavalry()
     {
-        AttemptBuyArmy(ArmyType.Cavalery);
+        AttemptBuyArmy(ArmyType.Cavalry);
     }
 
     private void AttemptBuyArmy(ArmyType type)
@@ -75,7 +73,7 @@ public class Player : MonoBehaviour
                     cash -= 100;
                 }
                 break;
-            case ArmyType.Cavalery:
+            case ArmyType.Cavalry:
                 break;
             default:
                 throw new System.ArgumentException();
@@ -101,6 +99,9 @@ public class Player : MonoBehaviour
         newArmy.transform.position = spawnPoint;
         newArmy.ChangeTeam(team);
         armies.Add(newArmy);
+
+        if(cheater)
+            newArmy.Cheat();
     }
 
     internal void KillArmies(List<Army> toRemove)
@@ -134,6 +135,29 @@ public class Player : MonoBehaviour
         foreach (var army in armies)
         {
             army.OnEnemiesKilled(armiesPendingRemoval);
+        }
+    }
+
+    internal bool TryUpgrade(ArmyType armyType)
+    {
+        var armyRank = armyRanks[(int)armyType];
+        var upgradeCost = Army.UpgradeCost(armyRank);
+        if (upgradeCost <= cash)
+        {
+            Upgrade(armyType);
+            cash -= upgradeCost;
+            armyRanks[(int)armyType]++;
+            return true;
+        }
+        return false;
+    }
+
+    private void Upgrade(ArmyType armyType)
+    {
+        foreach (var army in armies)
+        {
+            if (army.IsType(armyType))
+                army.Upgrade();
         }
     }
 }

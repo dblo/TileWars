@@ -21,6 +21,7 @@ public class GameManager : MonoBehaviour
     private Text p1CashText;
     private Text p1ScoreText;
     private Text p2ScoreText;
+    private Text upgradeText;
 
     private static GameManager instance = null;
     private int SCORE_TO_WIN = 10000;
@@ -36,6 +37,7 @@ public class GameManager : MonoBehaviour
         p1ScoreText = GameObject.Find("PlayerScoreText").GetComponent<Text>();
         p2ScoreText = GameObject.Find("OpponentScoreText").GetComponent<Text>();
         p1CashText = GameObject.Find("PlayerCashText").GetComponent<Text>();
+        upgradeText = GameObject.Find("UpgradeText").GetComponent<Text>();
     }
 
     // Is this reliable if using callied from other script's Awake()?
@@ -111,7 +113,7 @@ public class GameManager : MonoBehaviour
                     break;
             }
         }
-        CheckIfGameOver();
+        //CheckIfGameOver();
         UpdateUI();
     }
 
@@ -178,9 +180,31 @@ public class GameManager : MonoBehaviour
     {
         if (selectedObject == obj)
             return;
+
         ClearSelection();
+        if (!SelectionAllowed(obj))
+            return;
+
         selectedObject = obj;
         selectedObject.Select();
+        UpdateUpgradeText();
+    }
+
+    private bool SelectionAllowed(ISelectableObject obj)
+    {
+        if(obj is Army)
+        {
+            return (obj as Army).GetTeam() == Team.Blue;
+        } else if(obj is Tile)
+        {
+            return obj is TraversableTile && (obj as TraversableTile).ControlledBy() == Team.Blue;
+        }
+        return true;
+    }
+
+    private void UpdateUpgradeText()
+    {
+        upgradeText.text = "Upgrade\n" + selectedObject.GetDescriptor();
     }
 
     private void ClearSelection()
@@ -205,6 +229,11 @@ public class GameManager : MonoBehaviour
         return selectedObject is Army;
     }
 
+    private Army GetSelectedArmy()
+    {
+        return selectedObject as Army;
+    }
+
     void ProcessGesturForSelectedArmy()
     {
         if (Input.GetMouseButton(0))
@@ -219,11 +248,35 @@ public class GameManager : MonoBehaviour
         {
             if (swipeStartTime + MIN_SWIPE_TIME <= Time.time)
             {
-                (selectedObject as Army).ChangeTravelPath(swipePath);
+                GetSelectedArmy().ChangeTravelPath(swipePath);
             }
             swipePath = new List<Vector2>();
             swipeStartTime = -1;
             return;
         }
+    }
+
+    public void TryUpgradeSelected()
+    {
+        if (!HasSelection())
+            return;
+
+        if (ArmySelected())
+        {
+            var armyType = Army.ArmyToArmyType(GetSelectedArmy());
+            if(p1.TryUpgrade(armyType))
+            {
+                UpdateUpgradeText();
+            }
+        }
+        else if (TileSelected())
+        {
+
+        }
+    }
+
+    private bool TileSelected()
+    {
+        return selectedObject is Tile;
     }
 }

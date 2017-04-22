@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System;
+using System.Linq;
+using System.Collections.ObjectModel;
 
 public class Artillery : Army
 {
@@ -12,17 +14,16 @@ public class Artillery : Army
     //[SerializeField]
     //private int bombardDamge;
     [SerializeField]
-    private float bombardRange;
+    private readonly float BOMBARD_MODE_BONUS = 0.5f;
     private float deplomentTimer = 0;
-
-    private const float SHELL_LIFETIME = 0.7f;
-    private const float DEPLOY_TIME = 3f;
     private bool inBombardMode;
+    //private const float SHELL_LIFETIME = 0.7f;
+    private const float DEPLOY_TIME = 3f;
 
-    protected override void Awake()
-    {
-        base.Awake();
-    }
+    private static List<int> attackDamageLevels = new List<int> { 2, 4, 8, 16 };
+    private static List<int> hpLevels = new List<int> { 3, 6, 9, 12 };
+    private static List<float> speedLevels = new List<float> { 0.01f, 0.02f };
+    private static List<float> rangeLevels = new List<float> { 1.25f, 1.5f, 1.75f, 2f };
 
     void Update()
     {
@@ -79,7 +80,7 @@ public class Artillery : Army
     private void SetBombardMode(bool val)
     {
         inBombardMode = val;
-        OnRangeChanged();
+        UpdateRange();
     }
 
     public override void ChangeTravelPath(List<Vector2> swipePath)
@@ -89,11 +90,46 @@ public class Artillery : Army
         base.ChangeTravelPath(swipePath);
     }
 
-    protected override float GetEffectiveRange()
+    protected override void UpdateRange()
     {
-        float eRange;
-        eRange = inBombardMode ? bombardRange : range;
-        eRange = inHill ? eRange * 1.5f : eRange;
-        return eRange;
+        float tmpRange = GetItemAtRankOrLast(GetRangeLevels());
+        if (inBombardMode)
+            tmpRange += BOMBARD_MODE_BONUS;
+        if (inHill)
+            tmpRange *= HILL_RANGE_MULTIPLIER;
+        range = tmpRange;
+        OnRangeChanged();
+    }
+
+    public override string GetDescriptor()
+    {
+        if (UpgradeMaxed())
+            return "A MAX";
+        return "A" + (rank + 1) + "-$" + UpgradeCost(rank + 1);
+    }
+
+    internal override bool IsType(ArmyType type)
+    {
+        return ArmyType.Artillery == type;
+    }
+
+    protected override ReadOnlyCollection<int> GetAttackDamageLevels()
+    {
+        return attackDamageLevels.AsReadOnly();
+    }
+
+    protected override ReadOnlyCollection<int> GetHPLevels()
+    {
+        return hpLevels.AsReadOnly();
+    }
+
+    protected override ReadOnlyCollection<float> GetSpeedLevels()
+    {
+        return speedLevels.AsReadOnly();
+    }
+
+    protected override ReadOnlyCollection<float> GetRangeLevels()
+    {
+        return rangeLevels.AsReadOnly();
     }
 }

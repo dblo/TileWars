@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UI;
 
 public enum Team { Red, Blue, Neutral };
+public enum ArmyType { Infantry = 0, Cavalry = 1, Artillery = 2};
 
-public class Army : MonoBehaviour, ISelectableObject
+public abstract class Army : MonoBehaviour, ISelectableObject
 {
     private const double REACHED_WAYPOINT_DISTANCE = .05;
+    protected readonly float HILL_RANGE_MULTIPLIER = 1.5f;
+
     [SerializeField]
     protected Team team;
     private Text powerText;
@@ -20,15 +24,19 @@ public class Army : MonoBehaviour, ISelectableObject
     protected Transform rangeDisplay;
     protected bool inHill;
     TraversableTile nowInTile;
+    protected int rank = 0; // Shown as rank+1 in-game
 
+    private static List<int> upgradeCostLevels = new List<int> { 0, 100, 500, 1000 };
+    private static List<int> purchaseCostLevels = new List<int> { 100, 200, 400, 800 };
+    
     #region Combat Stats
     private int power;
     [SerializeField]
     protected int attackDamage = 10;
     [SerializeField]
-    private int armySize = 100;
+    protected int hp = 100;
     [SerializeField]
-    private float speed = 0.03f;
+    protected float speed = 0.03f;
     [SerializeField]
     protected float range = 0.5f;
     #endregion
@@ -36,7 +44,7 @@ public class Army : MonoBehaviour, ISelectableObject
     #region Getters/Setters/Predicates
     internal bool IsAlive()
     {
-        return armySize > 0;
+        return hp > 0;
     }
 
     internal float GetSpeed()
@@ -102,6 +110,15 @@ public class Army : MonoBehaviour, ISelectableObject
         UpdateText();
     }
 
+    internal static ArmyType ArmyToArmyType(Army army)
+    {
+        if (army is Infantry)
+            return ArmyType.Infantry;
+        else if (army is Artillery)
+            return ArmyType.Artillery;
+        throw new System.ArgumentException();
+    }
+
     internal void OnEnteredTile(TraversableTile tile)
     {
         nowInTile = tile;
@@ -145,15 +162,52 @@ public class Army : MonoBehaviour, ISelectableObject
     private void SetInHill(bool val)
     {
         inHill = val;
+        UpdateRange();
+    }
+
+    internal void Upgrade()
+    {
+        rank++;
+        UpdateAttackDamage();
+        UpdateHP();
+        UpdateSpeed();
+        UpdateRange();
+    }
+
+    protected T GetItemAtRankOrLast<T>(ReadOnlyCollection<T> list)
+    {
+        if (rank < list.Count)
+            return list[rank];
+        return list.Last();
+    }
+    
+    protected virtual void UpdateAttackDamage()
+    {
+        attackDamage = GetItemAtRankOrLast(GetAttackDamageLevels());
+    }
+
+    protected virtual void UpdateHP()
+    {
+        hp = GetItemAtRankOrLast(GetHPLevels());
+    }
+
+    protected virtual void UpdateSpeed()
+    {
+        speed = GetItemAtRankOrLast(GetSpeedLevels());
+    }
+
+    protected virtual void UpdateRange()
+    {
+        range = GetItemAtRankOrLast(GetRangeLevels());
+        if (inHill)
+            range *= HILL_RANGE_MULTIPLIER;
         OnRangeChanged();
     }
 
-    protected virtual float GetEffectiveRange()
-    {
-        if (inHill)
-            return range * 1.5f;
-        return range;
-    }
+    protected abstract ReadOnlyCollection<int> GetAttackDamageLevels();
+    protected abstract ReadOnlyCollection<int> GetHPLevels();
+    protected abstract ReadOnlyCollection<float> GetSpeedLevels();
+    protected abstract ReadOnlyCollection<float> GetRangeLevels();
 
     private void OnDestroy()
     {
@@ -168,25 +222,33 @@ public class Army : MonoBehaviour, ISelectableObject
 
     protected virtual void OnRangeChanged()
     {
-        var effectveRange = GetEffectiveRange();
         var coll = transform.Find("RangeManager").GetComponent<CircleCollider2D>();
-        coll.radius = effectveRange;
-        rangeDisplay.localScale = new Vector3(effectveRange, effectveRange);
+        coll.radius = range;
+        rangeDisplay.localScale = new Vector3(range, range);
     }
 
     internal void RandomizeStats()
     {
         attackDamage = UnityEngine.Random.Range(1, 6);
-        armySize = UnityEngine.Random.Range(5, 15);
+        hp = UnityEngine.Random.Range(5, 15);
         speed = UnityEngine.Random.Range(0.01f, 0.04f);
         range = UnityEngine.Random.Range(0.5f, 1f);
+        UpdatePower();
+    }
+
+    internal void Cheat()
+    {
+        attackDamage = UnityEngine.Random.Range(3, 9);
+        hp = UnityEngine.Random.Range(25, 35);
+        speed = UnityEngine.Random.Range(0.03f, 0.03f);
+        //range = UnityEngine.Random.Range(1.5f, 1.5f);
         UpdatePower();
     }
 
     internal void SetLevel(int level)
     {
         attackDamage = 2;
-        armySize = 10;
+        hp = 10;
     }
 
     internal void ChangeTeam(Team newTeam)
@@ -202,12 +264,12 @@ public class Army : MonoBehaviour, ISelectableObject
 
     private void UpdatePower()
     {
-        power = armySize * attackDamage;
+        power = hp * attackDamage;
     }
 
     internal void TakeDamage(int damage)
     {
-        armySize -= damage;
+        hp -= damage;
         UpdatePower();
     }
 
@@ -302,7 +364,7 @@ public class Army : MonoBehaviour, ISelectableObject
         {
             RemoveUnreachableWaypoint();
         }
-        else if(collision.gameObject.GetComponent<Tile>() != null)
+        else if (collision.gameObject.GetComponent<Tile>() != null)
         {
             RemoveUnreachableWaypoint();
         }
@@ -336,4 +398,27 @@ public class Army : MonoBehaviour, ISelectableObject
     {
         SetShowRangeDisplay(false);
     }
+
+    public abstract string GetDescriptor();
+
+    internal static int UpgradeCost(int rank)
+    {
+        if (rank >= upgradeCostLevels.Count - 1)
+            return upgradeCostLevels.Last();
+        return upgradeCostLevels[rank];
+    }
+
+    internal int PurchaseCost(int rank)
+    {
+        if (UpgradeMaxed())
+            return purchaseCostLevels[upgradeCostLevels.Count - 1];
+        return purchaseCostLevels[rank];
+    }
+
+    protected bool UpgradeMaxed()
+    {
+        return rank >= upgradeCostLevels.Count - 1;
+    }
+
+    internal abstract bool IsType(ArmyType type);
 }

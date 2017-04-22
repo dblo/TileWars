@@ -6,9 +6,8 @@ public class AIPlayer : Player
     private int logicCounter;
     private GameBoard gameBoard;
 
-    override protected void Start()
+    protected void Start()
     {
-        base.Start();
         gameBoard = FindObjectOfType<GameBoard>();
     }
 
@@ -50,8 +49,7 @@ public class AIPlayer : Player
     protected override void SpawnArmy(Vector2 spawnPoint, GameObject prefab)
     {
         base.SpawnArmy(spawnPoint, prefab);
-        //armies[armies.Count - 1].RandomizeStats();
-        armies[armies.Count - 1].SetLevel(0);
+        armies[armies.Count - 1].RandomizeStats();
     }
 
     private void MoveArmies()
