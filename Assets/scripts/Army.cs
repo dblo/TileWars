@@ -107,7 +107,6 @@ public abstract class Army : MonoBehaviour, ISelectableObject
     {
         UpdatePower();
         OnRangeChanged();
-        UpdateText();
     }
 
     internal static ArmyType ArmyToArmyType(Army army)
@@ -172,6 +171,7 @@ public abstract class Army : MonoBehaviour, ISelectableObject
         UpdateHP();
         UpdateSpeed();
         UpdateRange();
+        UpdatePower();
     }
 
     protected T GetItemAtRankOrLast<T>(ReadOnlyCollection<T> list)
@@ -264,7 +264,8 @@ public abstract class Army : MonoBehaviour, ISelectableObject
 
     private void UpdatePower()
     {
-        power = hp * attackDamage;
+        power = (rank + 1) * hp;
+        UpdatePowerText();
     }
 
     internal void TakeDamage(int damage)
@@ -324,11 +325,11 @@ public abstract class Army : MonoBehaviour, ISelectableObject
     protected virtual void Attack(Army enemy)
     {
         enemy.TakeDamage(attackDamage);
-        enemy.UpdateText();
+        enemy.UpdatePowerText();
         //Debug.Log(team + " attacked: " + attackDamage + "dmg. " + enemy.team + " hp: " + enemy.armySize);
     }
 
-    private void UpdateText()
+    private void UpdatePowerText()
     {
         powerText.text = GetPower();
     }

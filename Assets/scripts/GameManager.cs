@@ -140,40 +140,39 @@ public class GameManager : MonoBehaviour
         foreach (var army in p2.GetArmies())
         {
             if (army.IsInCombat())
-            {
                 army.DoCombat();
-            }
         }
         foreach (var army in p1.GetArmies())
         {
             if (army.IsInCombat())
-            {
                 army.DoCombat();
-            }
         }
+        PostCombatCleanup(p1, p2);
+        PostCombatCleanup(p2, p1);
+    }
 
+    private void PostCombatCleanup(Player playerA, Player playerB)
+    {
         List<Army> armiesPendingRemoval = new List<Army>();
-        foreach (var army in p2.GetArmies())
+        foreach (var army in playerA.GetArmies())
         {
             if (!army.IsAlive())
             {
                 armiesPendingRemoval.Add(army);
+                if (IsSelected(army))
+                {
+                    ClearSelection();
+                    UpdateUpgradeText();
+                }
             }
         }
-        p1.OnEnemiesKilled(armiesPendingRemoval);
-        p2.KillArmies(armiesPendingRemoval);
-        armiesPendingRemoval.Clear();
+        playerB.OnEnemiesKilled(armiesPendingRemoval);
+        playerA.KillArmies(armiesPendingRemoval);
+    }
 
-        foreach (var army in p1.GetArmies())
-        {
-            if (!army.IsAlive())
-            {
-                armiesPendingRemoval.Add(army);
-            }
-        }
-        p2.OnEnemiesKilled(armiesPendingRemoval);
-        p1.KillArmies(armiesPendingRemoval);
-        armiesPendingRemoval.Clear();
+    private bool IsSelected(Army army)
+    {
+        return GetSelectedArmy() == army;
     }
 
     internal void OnSelection(ISelectableObject obj)
@@ -204,7 +203,10 @@ public class GameManager : MonoBehaviour
 
     private void UpdateUpgradeText()
     {
-        upgradeText.text = "Upgrade\n" + selectedObject.GetUpgradeDescriptor();
+        if (selectedObject != null)
+            upgradeText.text = "Upgrade\n" + selectedObject.GetUpgradeDescriptor();
+        else
+            upgradeText.text = "Upgrade\n-";
     }
 
     private void ClearSelection()
