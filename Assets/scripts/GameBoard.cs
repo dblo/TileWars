@@ -38,28 +38,13 @@ public class GameBoard : MonoBehaviour {
         return boardRows;
     }
 
-    //private Tile GetTile(Vector2 screenCoordinate)
-    //{
-    //    var worldCoordinate = Camera.main.ScreenToWorldPoint(screenCoordinate);
-    //    return GetTile(worldCoordinate.y, worldCoordinate.x);
-    //}
-
-    //private Tile GetTile(float row, float col)
-    //{
-    //    return GetTile((int)row, (int)col);
-    //}
-
+    // Row, col in WorldSpace
     public TraversableTile GetTile(int row, int col)
     {
         if (row < 0 || col < 0 || row >= boardRows || col >= boardCols)
             throw new ArgumentException();
         return tiles[row * boardCols + col] as TraversableTile;
     }
-
-    //public ReadOnlyCollection<Tile> GetTiles()
-    //{
-    //    return tiles.AsReadOnly();
-    //}
 
     internal ReadOnlyCollection<TraversableTile> GetTraversableTiles()
     {

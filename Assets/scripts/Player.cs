@@ -21,7 +21,7 @@ public class Player : MonoBehaviour
     private int score;
     private const int MAX_CASH = 9999;
     [SerializeField]
-    private Team team;
+    protected Team team;
     // Mapped to by ArmyType for 0=Infantry, 1=Cavalry, 2=Artillery
     List<int> armyRanks = new List<int> { 0, 0, 0 };
     public bool cheater; //debug
@@ -81,7 +81,7 @@ public class Player : MonoBehaviour
             return artilleryPrefab;
     }
 
-    protected bool TryBuyArmy(GameObject prefab, int armyRank)
+    protected virtual bool TryBuyArmy(GameObject prefab, int armyRank)
     {
         if (cash >= Army.PurchaseCost(armyRank))
         {

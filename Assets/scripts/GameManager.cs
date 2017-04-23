@@ -25,6 +25,7 @@ public class GameManager : MonoBehaviour
 
     private static GameManager instance = null;
     private int SCORE_TO_WIN = 10000;
+    private bool changedSelectionThisMouseEvent;
 
     private void Awake()
     {
@@ -40,7 +41,7 @@ public class GameManager : MonoBehaviour
         upgradeText = GameObject.Find("UpgradeText").GetComponent<Text>();
     }
 
-    // Is this reliable if using callied from other script's Awake()?
+    // Is this reliable if called from other script's Awake()?
     public static GameManager Get()
     {
         if (instance == null)
@@ -58,30 +59,18 @@ public class GameManager : MonoBehaviour
             p2 = p2GO.GetComponent<Player>();
 
         nextMousePoll = Time.time;
-        SetInitialSelection();
-    }
-
-    private void SetInitialSelection()
-    {
-        var p1Armies = p1.GetArmies();
-        if (p1Armies.Count > 0)
-            OnSelection(p1Armies[0]);
     }
 
     private void Update()
     {
-        if (nextMousePoll <= Time.time)
-        {
-            nextMousePoll = Time.time + MOUSE_POLL_RATE;
-            if (ArmySelected())
-                ProcessGesturForSelectedArmy();
-        }
+        if (ArmySelected())
+            ProcessGesturForSelectedArmy();
 
         logicCounter -= Time.deltaTime;
         if (logicCounter <= 0)
         {
             logicCounter = COMBAT_LOGIC_INTERVAL;
-            if (p2 && p1) // TODO disable for release?
+            if (p1 && p2) // TODO disable for release?
             {
                 RunCombatLogic();
                 UpdateCashScore();
@@ -180,14 +169,16 @@ public class GameManager : MonoBehaviour
         selectedObject = obj;
         selectedObject.Select();
         UpdateUpgradeText();
+        changedSelectionThisMouseEvent = true;
     }
 
     private bool SelectionAllowed(ISelectableObject obj)
     {
-        if(obj is Army)
+        if (obj is Army)
         {
             return (obj as Army).GetTeam() == Team.Blue;
-        } else if(obj is Tile)
+        }
+        else if (obj is Tile)
         {
             return obj is TraversableTile && (obj as TraversableTile).ControlledBy() == Team.Blue;
         }
@@ -231,27 +222,46 @@ public class GameManager : MonoBehaviour
 
     void ProcessGesturForSelectedArmy()
     {
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButtonDown(0))
         {
-            if (!MouseOverGameBoard())
-                return;
-
             if (swipeStartTime < 0)
             {
                 swipeStartTime = Time.time;
             }
-            swipePath.Add(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+        }
+        else if (Input.GetMouseButton(0))
+        {
+            if (nextMousePoll <= Time.time)
+            {
+                nextMousePoll = Time.time + MOUSE_POLL_RATE;
+
+                if (!MouseOverGameBoard())
+                    return;
+
+                swipePath.Add(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+            }
         }
         else if (swipeStartTime > 0)
         {
-            if (swipeStartTime + MIN_SWIPE_TIME <= Time.time)
+            if (DidGesture())
             {
                 GetSelectedArmy().ChangeTravelPath(swipePath);
             }
+            else if(!changedSelectionThisMouseEvent)
+            {
+                var pos = GetSelectedArmy().transform.position;
+                var tileUnderObj = gameBoard.GetTile((int)pos.y, (int)pos.x);
+                OnSelection(tileUnderObj);
+            }
             swipePath = new List<Vector2>();
             swipeStartTime = -1;
-            return;
+            changedSelectionThisMouseEvent = false;
         }
+    }
+
+    private bool DidGesture()
+    {
+        return swipeStartTime + MIN_SWIPE_TIME <= Time.time;
     }
 
     private bool MouseOverGameBoard()
@@ -270,7 +280,7 @@ public class GameManager : MonoBehaviour
         if (ArmySelected())
         {
             var armyType = Army.ArmyToArmyType(GetSelectedArmy());
-            if(p1.TryUpgrade(armyType))
+            if (p1.TryUpgrade(armyType))
             {
                 UpdateUpgradeText();
             }

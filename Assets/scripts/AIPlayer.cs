@@ -43,6 +43,16 @@ public class AIPlayer : Player
         }
     }
 
+    protected override bool TryBuyArmy(GameObject prefab, int armyRank)
+    {
+        var newArmy = Instantiate(prefab, transform).GetComponent<Army>();
+        newArmy.transform.position = GetSpawnPoint();
+        newArmy.SetRank(armyRank);
+        newArmy.ChangeTeam(team);
+        armies.Add(newArmy);
+        return true;
+    }
+
     private void MoveArmies()
     {
         foreach (var army in armies)
