@@ -222,26 +222,26 @@ public class GameManager : MonoBehaviour
 
     void ProcessGesturForSelectedArmy()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && MouseOverGameBoard())
         {
             if (swipeStartTime < 0)
             {
                 swipeStartTime = Time.time;
             }
         }
-        else if (Input.GetMouseButton(0))
+
+        if (swipeStartTime < 0)
+            return;
+
+        if (Input.GetMouseButton(0))
         {
             if (nextMousePoll <= Time.time)
             {
                 nextMousePoll = Time.time + MOUSE_POLL_RATE;
-
-                if (!MouseOverGameBoard())
-                    return;
-
                 swipePath.Add(Camera.main.ScreenToWorldPoint(Input.mousePosition));
             }
         }
-        else if (swipeStartTime > 0)
+        else if (Input.GetMouseButtonUp(0))
         {
             if (DidGesture())
             {
@@ -249,14 +249,19 @@ public class GameManager : MonoBehaviour
             }
             else if(!changedSelectionThisMouseEvent)
             {
-                var pos = GetSelectedArmy().transform.position;
-                var tileUnderObj = gameBoard.GetTile((int)pos.y, (int)pos.x);
-                OnSelection(tileUnderObj);
+                SelectTileUnderSelectedArmy();
             }
             swipePath = new List<Vector2>();
             swipeStartTime = -1;
             changedSelectionThisMouseEvent = false;
         }
+    }
+
+    private void SelectTileUnderSelectedArmy()
+    {
+        var pos = GetSelectedArmy().transform.position;
+        var tileUnderObj = gameBoard.GetTile((int)pos.y, (int)pos.x);
+        OnSelection(tileUnderObj);
     }
 
     private bool DidGesture()

@@ -42,6 +42,7 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
     [SerializeField]
     protected float range;
     protected ITileCombatModifiers tileCombatMods;
+    private const int MIN_DAMAGE_TAKEN = 1;
     #endregion
 
     #region Getters/Setters/Predicates
@@ -149,6 +150,7 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
         rank = aRank;
     }
 
+    // Update stats except for HP
     private void UpdateStats()
     {
         UpdateAttackDamage();
@@ -253,7 +255,7 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
 
     internal void TakeDamage(int damage)
     {
-        int damageToTake = 1;
+        int damageToTake = MIN_DAMAGE_TAKEN;
         if (damage > defense)
             damageToTake = damage - defense;
         hp -= damageToTake;
