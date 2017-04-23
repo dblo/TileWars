@@ -26,6 +26,7 @@ public class GameManager : MonoBehaviour
     private static GameManager instance = null;
     private int SCORE_TO_WIN = 10000;
     private bool changedSelectionThisMouseEvent;
+    private SpriteRenderer tileSelectionRenderer;
 
     private void Awake()
     {
@@ -39,6 +40,7 @@ public class GameManager : MonoBehaviour
         p2ScoreText = GameObject.Find("OpponentScoreText").GetComponent<Text>();
         p1CashText = GameObject.Find("PlayerCashText").GetComponent<Text>();
         upgradeText = GameObject.Find("UpgradeText").GetComponent<Text>();
+        tileSelectionRenderer = GameObject.Find("TileSelection").GetComponent<SpriteRenderer>();
     }
 
     // Is this reliable if called from other script's Awake()?
@@ -170,8 +172,27 @@ public class GameManager : MonoBehaviour
         }
         selectedObject = obj;
         selectedObject.Select();
+
+        if (TileSelected())
+        {
+            ShowAndMoveSelectionOverlay();
+        }
         UpdateUpgradeText();
         changedSelectionThisMouseEvent = true;
+    }
+
+    // Translate the overlay in the 2D plane and enable rendering
+    private void ShowAndMoveSelectionOverlay()
+    {
+        var newPos = GetSelectedTile().transform.position;
+        newPos.z = tileSelectionRenderer.transform.position.z;
+        tileSelectionRenderer.transform.position = newPos;
+        tileSelectionRenderer.enabled = true;
+    }
+
+    private void HideSelectionOverlay()
+    {
+        tileSelectionRenderer.enabled = false;
     }
 
     private bool SelectionAllowed(ISelectableObject obj)
@@ -197,6 +218,7 @@ public class GameManager : MonoBehaviour
 
     private void ClearSelection()
     {
+        HideSelectionOverlay();
         if (HasSelection())
             selectedObject.Deselect();
         selectedObject = null;
