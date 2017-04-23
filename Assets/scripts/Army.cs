@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using UnityEngine;
@@ -392,21 +391,21 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
 
     internal static int UpgradeCost(int rank)
     {
-        if (rank >= upgradeCostLevels.Count - 1)
-            return upgradeCostLevels.Last();
-        return upgradeCostLevels[rank];
+        if (rank < upgradeCostLevels.Count)
+            return upgradeCostLevels[rank];
+        return upgradeCostLevels.Last();
     }
 
     internal static int PurchaseCost(int rank)
     {
-        if (rank >= purchaseCostLevels.Count - 1)
-            return purchaseCostLevels.Last();
-        return purchaseCostLevels[rank];
+        if (rank < purchaseCostLevels.Count)
+            return purchaseCostLevels[rank];
+        return purchaseCostLevels.Last();
     }
 
     protected bool UpgradeMaxed()
     {
-        return rank >= upgradeCostLevels.Count - 1;
+        return rank >= upgradeCostLevels.Count;
     }
 
     internal abstract bool IsType(ArmyType type);

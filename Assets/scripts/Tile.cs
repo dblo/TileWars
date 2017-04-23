@@ -26,9 +26,9 @@ public class Tile : MonoBehaviour, ISelectableObject
 
     internal int UpgradeCost()
     {
-        if (rank >= upgradeCostLevels.Count - 1)
-            return upgradeCostLevels.Last();
-        return upgradeCostLevels[rank];
+        if (rank < upgradeCostLevels.Count)
+            return upgradeCostLevels[rank];
+        return upgradeCostLevels.Last();
     }
 
     internal TileType GetTileType()

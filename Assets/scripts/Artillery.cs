@@ -105,7 +105,7 @@ public class Artillery : Army
     {
         if (UpgradeMaxed())
             return "A MAX";
-        return "A" + (rank + 1) + "-$" + UpgradeCost(rank + 1);
+        return "A" + (rank + 1) + "-$" + UpgradeCost(rank);
     }
 
     internal override bool IsType(ArmyType type)
