@@ -13,7 +13,7 @@ public class Infantry : Army
     public override string GetUpgradeDescriptor()
     {
         if (UpgradeMaxed())
-            return "I MAX";
+            return null;
         return "I" + (rank + 1) + "-$" + UpgradeCost(rank);
     }
 

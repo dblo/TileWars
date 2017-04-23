@@ -211,7 +211,20 @@ public class GameManager : MonoBehaviour
     private void UpdateUpgradeText()
     {
         if (selectedObject != null)
-            upgradeText.text = "Upgrade\n" + selectedObject.GetUpgradeDescriptor();
+        {
+            var upgradeDetails = selectedObject.GetUpgradeDescriptor();
+            if(upgradeDetails != null)
+            {
+                upgradeText.text = "Upgrade\n" + upgradeDetails;
+                GameObject.Find("UpgradeButton").GetComponent<Button>().interactable = true;
+            }
+            else
+            {
+                upgradeText.text = "Upgrade\nMaxed";
+                GameObject.Find("UpgradeButton").GetComponent<Button>().interactable = false;
+            }
+
+        }
         else
             upgradeText.text = "Upgrade\n-";
     }

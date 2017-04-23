@@ -150,7 +150,7 @@ public class Player : MonoBehaviour
     internal bool TryUpgrade(Tile tile)
     {
         var upgradeCost = tile.UpgradeCost();
-        if (upgradeCost <= cash && !tile.IsMaxRank())
+        if (upgradeCost <= cash && !tile.UpgradeMaxed())
         {
             tile.Upgrade();
             cash -= upgradeCost;

@@ -104,7 +104,7 @@ public class Artillery : Army
     public override string GetUpgradeDescriptor()
     {
         if (UpgradeMaxed())
-            return "A MAX";
+            return null;
         return "A" + (rank + 1) + "-$" + UpgradeCost(rank);
     }
 

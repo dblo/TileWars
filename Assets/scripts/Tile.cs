@@ -43,6 +43,9 @@ public class Tile : MonoBehaviour, ISelectableObject
 
     public string GetUpgradeDescriptor()
     {
+        if (UpgradeMaxed())
+            return null;
+
         switch (tileType)
         {
             case TileType.Plain:
@@ -60,7 +63,7 @@ public class Tile : MonoBehaviour, ISelectableObject
         throw new NotImplementedException();
     }
 
-    internal bool IsMaxRank()
+    internal bool UpgradeMaxed()
     {
         return rank >= MAX_TILE_RANK;
     }

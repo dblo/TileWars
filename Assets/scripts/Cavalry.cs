@@ -11,7 +11,7 @@ public class Cavalry : Army {
     public override string GetUpgradeDescriptor()
     {
         if (UpgradeMaxed())
-            return "C MAX";
+            return null;
         return "C" + (rank + 1) + "-$" + UpgradeCost(rank);
     }
 
