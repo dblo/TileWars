@@ -83,7 +83,7 @@ public class TraversableTile : Tile
     internal override void Upgrade()
     {
         rank++;
-        GetComponent<SpriteRenderer>().sprite = sprites[0];
+        GetComponent<SpriteRenderer>().sprite = sprites[rank];
         modifiers = TileModifiersFactory.Create(tileType, rank);
     }
 }

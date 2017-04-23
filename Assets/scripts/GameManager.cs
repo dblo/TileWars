@@ -164,8 +164,10 @@ public class GameManager : MonoBehaviour
 
         ClearSelection();
         if (!SelectionAllowed(obj))
+        {
+            UpdateUpgradeText();
             return;
-
+        }
         selectedObject = obj;
         selectedObject.Select();
         UpdateUpgradeText();
