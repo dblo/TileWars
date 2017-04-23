@@ -1,12 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-public enum TileType { Plains, Hill, Mountain, Water };
+public enum TileType { Plain, Hill, Mine, Mountain, Water };
 
 public class Tile : MonoBehaviour, ISelectableObject
 {
+    public const int MAX_TILE_RANK = 3;
     [SerializeField]
-    private TileType tileType;
+    protected TileType tileType;
+    protected int rank = 0;
+    
+    private static List<int> upgradeCostLevels = new List<int> { 100, 500, 1000 };
 
     public void Select()
     {
@@ -17,7 +23,14 @@ public class Tile : MonoBehaviour, ISelectableObject
     {
         //deactivate selected overlay
     }
-    
+
+    internal int UpgradeCost()
+    {
+        if (rank >= upgradeCostLevels.Count - 1)
+            return upgradeCostLevels.Last();
+        return upgradeCostLevels[rank];
+    }
+
     internal TileType GetTileType()
     {
         return tileType;
@@ -32,17 +45,23 @@ public class Tile : MonoBehaviour, ISelectableObject
     {
         switch (tileType)
         {
-            case TileType.Plains:
-                break;
+            case TileType.Plain:
+                return "P" + (rank + 1) + "-$" + UpgradeCost();
             case TileType.Hill:
-                break;
-            case TileType.Mountain:
-                break;
-            case TileType.Water:
-                break;
-            default:
-                break;
+                return "H" + (rank + 1) + "-$" + UpgradeCost();
+            case TileType.Mine:
+                return "M" + (rank + 1) + "-$" + UpgradeCost();
         }
-        return "";
+        throw new ArgumentException();
+    }
+
+    internal virtual void Upgrade()
+    {
+        throw new NotImplementedException();
+    }
+
+    internal bool IsMaxRank()
+    {
+        return rank >= MAX_TILE_RANK;
     }
 }

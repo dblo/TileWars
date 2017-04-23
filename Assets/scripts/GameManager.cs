@@ -86,12 +86,12 @@ public class GameManager : MonoBehaviour
             switch (tile.ControlledBy())
             {
                 case Team.Red:
-                    p2.AddCash(tile.GetCashValue());
-                    p2.AddScore(tile.GetScoreValue());
+                    p2.AddCash(tile.modifiers.CashValue);
+                    p2.AddScore(tile.modifiers.ScoreValues);
                     break;
                 case Team.Blue:
-                    p1.AddCash(tile.GetCashValue());
-                    p1.AddScore(tile.GetScoreValue());
+                    p1.AddCash(tile.modifiers.CashValue);
+                    p1.AddScore(tile.modifiers.ScoreValues);
                     break;
             }
         }
@@ -287,8 +287,16 @@ public class GameManager : MonoBehaviour
         }
         else if (TileSelected())
         {
-
+            if (p1.TryUpgrade(GetSelectedTile()))
+            {
+                UpdateUpgradeText();
+            }
         }
+    }
+
+    private Tile GetSelectedTile()
+    {
+        return selectedObject as Tile;
     }
 
     private bool TileSelected()

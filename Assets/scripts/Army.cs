@@ -9,7 +9,8 @@ using UnityEngine.UI;
 public enum Team { Red, Blue, Neutral };
 public enum ArmyType { Infantry = 0, Cavalry = 1, Artillery = 2};
 
-public abstract class Army : MonoBehaviour, ISelectableObject
+
+public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
 {
     private const double REACHED_WAYPOINT_DISTANCE = .05;
     protected readonly float HILL_RANGE_MULTIPLIER = 1.5f;
@@ -22,7 +23,6 @@ public abstract class Army : MonoBehaviour, ISelectableObject
     private List<Army> collidingEnemies = new List<Army>();
     private List<Vector2> currentTravelPath = new List<Vector2>();
     protected Transform rangeDisplay;
-    protected bool inHill;
     TraversableTile nowInTile;
     protected int rank = 0; // Shown as rank+1 in-game
 
@@ -34,11 +34,14 @@ public abstract class Army : MonoBehaviour, ISelectableObject
     [SerializeField]
     protected int attackDamage;
     [SerializeField]
+    protected int defense;
+    [SerializeField]
     protected int hp;
     [SerializeField]
     protected float speed;
     [SerializeField]
     protected float range;
+    protected ITileCombatModifiers tileCombatMods;
     #endregion
 
     #region Getters/Setters/Predicates
@@ -123,54 +126,33 @@ public abstract class Army : MonoBehaviour, ISelectableObject
     internal void OnEnteredTile(TraversableTile tile)
     {
         nowInTile = tile;
-        nowInTile.AddOccupant(this);
-
-        switch (tile.GetTileType())
-        {
-            case TileType.Plains:
-                break;
-            case TileType.Hill:
-                SetInHill(true);
-                break;
-            case TileType.Mountain:
-                break;
-            default:
-                break;
-        }
+        nowInTile.EnterTile(this);
     }
 
-    internal void OnExitedTile()
+    internal void OnLeftTile()
     {
         if (nowInTile == null)
             return;
 
-        nowInTile.RemoveOccupant(this);
-        switch (nowInTile.GetTileType())
-        {
-            case TileType.Plains:
-                break;
-            case TileType.Hill:
-                SetInHill(false);
-                break;
-            case TileType.Mountain:
-                break;
-            default:
-                break;
-        }
-        nowInTile = null;
-    }
-
-    private void SetInHill(bool val)
-    {
-        inHill = val;
-        UpdateRange();
+        nowInTile.LeaveTile(this);
     }
 
     internal void Upgrade()
     {
         rank++;
-        UpdateAttackDamage();
+        UpdateStats();
         UpdateHP();
+    }
+
+    internal void SetRank(int aRank)
+    {
+        rank = aRank;
+    }
+
+    private void UpdateStats()
+    {
+        UpdateAttackDamage();
+        UpdateDefense();
         UpdateSpeed();
         UpdateRange();
         UpdatePower();
@@ -188,6 +170,11 @@ public abstract class Army : MonoBehaviour, ISelectableObject
         attackDamage = GetItemAtRankOrLast(GetAttackDamageLevels());
     }
 
+    protected virtual void UpdateDefense()
+    {
+        defense = (int)(GetItemAtRankOrLast(GetDefenseLevels()) * tileCombatMods.DefenceMultiplier);
+    }
+
     protected virtual void UpdateHP()
     {
         hp = GetItemAtRankOrLast(GetHPLevels());
@@ -201,19 +188,19 @@ public abstract class Army : MonoBehaviour, ISelectableObject
     protected virtual void UpdateRange()
     {
         range = GetItemAtRankOrLast(GetRangeLevels());
-        if (inHill)
-            range *= HILL_RANGE_MULTIPLIER;
+        range *= tileCombatMods.RangeMultiplier;
         OnRangeChanged();
     }
 
     protected abstract ReadOnlyCollection<int> GetAttackDamageLevels();
+    protected abstract ReadOnlyCollection<int> GetDefenseLevels();
     protected abstract ReadOnlyCollection<int> GetHPLevels();
     protected abstract ReadOnlyCollection<float> GetSpeedLevels();
     protected abstract ReadOnlyCollection<float> GetRangeLevels();
 
     private void OnDestroy()
     {
-        nowInTile.RemoveOccupant(this);
+        nowInTile.LeaveTile(this);
     }
 
     internal void OnEnemiesKilled(List<Army> armiesPendingRemoval)
@@ -246,17 +233,7 @@ public abstract class Army : MonoBehaviour, ISelectableObject
         //range = UnityEngine.Random.Range(1.5f, 1.5f);
         UpdatePower();
     }
-
-    internal void SetRank(int aRank)
-    {
-        rank = aRank;
-        UpdateAttackDamage();
-        UpdateHP();
-        UpdateSpeed();
-        UpdateRange();
-        UpdatePower();
-    }
-
+    
     internal void ChangeTeam(Team newTeam)
     {
         team = newTeam;
@@ -276,7 +253,10 @@ public abstract class Army : MonoBehaviour, ISelectableObject
 
     internal void TakeDamage(int damage)
     {
-        hp -= damage;
+        int damageToTake = 1;
+        if (damage > defense)
+            damageToTake = damage - defense;
+        hp -= damageToTake;
         UpdatePower();
     }
 
@@ -391,7 +371,7 @@ public abstract class Army : MonoBehaviour, ISelectableObject
         var tile = collision.GetComponent<TraversableTile>();
         if (tile != null)
         {
-            OnExitedTile();
+            OnLeftTile();
             OnEnteredTile(tile);
         }
     }
@@ -428,4 +408,14 @@ public abstract class Army : MonoBehaviour, ISelectableObject
     }
 
     internal abstract bool IsType(ArmyType type);
+
+    public void TileModsChanged(ITileCombatModifiers mods)
+    {
+        tileCombatMods = mods;
+        if(tileCombatMods != null)
+        {
+            // When leaving a tile, leave the old stats to be overwritter when entered the new tile
+            UpdateStats();
+        }
+    }
 }

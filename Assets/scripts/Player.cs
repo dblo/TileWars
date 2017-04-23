@@ -147,6 +147,18 @@ public class Player : MonoBehaviour
         }
     }
 
+    internal bool TryUpgrade(Tile tile)
+    {
+        var upgradeCost = tile.UpgradeCost();
+        if (upgradeCost <= cash && !tile.IsMaxRank())
+        {
+            tile.Upgrade();
+            cash -= upgradeCost;
+            return true;
+        }
+        return false;
+    }
+
     internal bool TryUpgrade(ArmyType armyType)
     {
         var armyRank = armyRanks[(int)armyType];

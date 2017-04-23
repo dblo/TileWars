@@ -1,9 +1,11 @@
 ﻿using System.Collections.ObjectModel;
 using System.Collections.Generic;
+using System;
 
 public class Infantry : Army
 {
     private static List<int> attackDamageLevels = new List<int> { 1, 2, 4, 8 };
+    private static List<int> defenseDamageLevels = new List<int> { 1, 2, 3, 4 };
     private static List<int> hpLevels = new List<int> { 4, 8, 12, 16 };
     private static List<float> speedLevels = new List<float> { 0.02f, 0.03f};
     private static List<float> rangeLevels = new List<float> { 0.6f, 0.8f, 1f, 1.25f };
@@ -38,5 +40,10 @@ public class Infantry : Army
     protected override ReadOnlyCollection<float> GetRangeLevels()
     {
         return rangeLevels.AsReadOnly();
+    }
+
+    protected override ReadOnlyCollection<int> GetDefenseLevels()
+    {
+        return defenseDamageLevels.AsReadOnly();
     }
 }

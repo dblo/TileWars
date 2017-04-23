@@ -8,15 +8,13 @@ public class TraversableTile : Tile
     private List<Army> redOccupants = new List<Army>();
     private List<Army> blueOccupants = new List<Army>();
     private Team controllingTeam = Team.Neutral;
+    public TiletModifiers modifiers;
+    [SerializeField]
+    protected List<Sprite> sprites;
 
-    internal int GetScoreValue()
+    private void Awake()
     {
-        return 1;
-    }
-
-    internal int GetCashValue()
-    {
-        return 1;
+        modifiers = TileModifiersFactory.Create(tileType, rank);
     }
 
     public bool IsContested()
@@ -29,7 +27,7 @@ public class TraversableTile : Tile
         return controllingTeam;
     }
 
-    public void AddOccupant(Army army)
+    public void EnterTile(Army army)
     {
         if (army.GetTeam() == Team.Red)
             redOccupants.Add(army);
@@ -44,9 +42,10 @@ public class TraversableTile : Tile
         {
             ChangeControllingTeam(army.GetTeam());
         }
+        army.TileModsChanged(modifiers);
     }
 
-    public void RemoveOccupant(Army army)
+    public void LeaveTile(Army army)
     {
         if (army.GetTeam() == Team.Red)
         {
@@ -64,6 +63,7 @@ public class TraversableTile : Tile
                 ChangeControllingTeam(Team.Red);
             }
         }
+        army.TileModsChanged(null);
     }
     private void ChangeControllingTeam(Team team)
     {
@@ -78,5 +78,12 @@ public class TraversableTile : Tile
             renderer.color = new Color(255, 255, 255);
         else
             throw new ArgumentException();
+    }
+    
+    internal override void Upgrade()
+    {
+        rank++;
+        GetComponent<SpriteRenderer>().sprite = sprites[0];
+        modifiers = TileModifiersFactory.Create(tileType, rank);
     }
 }

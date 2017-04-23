@@ -21,6 +21,7 @@ public class Artillery : Army
     private const float DEPLOY_TIME = 3f;
 
     private static List<int> attackDamageLevels = new List<int> { 2, 4, 8, 16 };
+    private static List<int> defenseDamageLevels = new List<int> { 1, 2, 3, 4 };
     private static List<int> hpLevels = new List<int> { 3, 6, 9, 12 };
     private static List<float> speedLevels = new List<float> { 0.01f, 0.02f };
     private static List<float> rangeLevels = new List<float> { 1.25f, 1.5f, 1.75f, 2f };
@@ -95,8 +96,7 @@ public class Artillery : Army
         float tmpRange = GetItemAtRankOrLast(GetRangeLevels());
         if (inBombardMode)
             tmpRange += BOMBARD_MODE_BONUS;
-        if (inHill)
-            tmpRange *= HILL_RANGE_MULTIPLIER;
+        tmpRange *= tileCombatMods.RangeMultiplier;
         range = tmpRange;
         OnRangeChanged();
     }
@@ -131,5 +131,10 @@ public class Artillery : Army
     protected override ReadOnlyCollection<float> GetRangeLevels()
     {
         return rangeLevels.AsReadOnly();
+    }
+
+    protected override ReadOnlyCollection<int> GetDefenseLevels()
+    {
+        return defenseDamageLevels.AsReadOnly();
     }
 }
