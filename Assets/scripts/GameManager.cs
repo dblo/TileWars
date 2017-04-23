@@ -8,8 +8,8 @@ public class GameManager : MonoBehaviour
 {
     private GameBoard gameBoard;
     private ISelectableObject selectedObject;
-    private int logicCounter;
-    private const int LOGIC_TICKS = 50;
+    private float logicCounter = 0;
+    private const int COMBAT_LOGIC_INTERVAL = 1;
     private Player p1;
     private Player p2;
     private List<Vector2> swipePath = new List<Vector2>();
@@ -76,23 +76,16 @@ public class GameManager : MonoBehaviour
             if (ArmySelected())
                 ProcessGesturForSelectedArmy();
         }
-    }
 
-    private void FixedUpdate()
-    {
+        logicCounter -= Time.deltaTime;
         if (logicCounter <= 0)
         {
-            logicCounter = LOGIC_TICKS;
-
-            if (p2 && p1)
+            logicCounter = COMBAT_LOGIC_INTERVAL;
+            if (p2 && p1) // TODO disable for release?
             {
                 RunCombatLogic();
                 UpdateCashScore();
             }
-        }
-        else
-        {
-            logicCounter--;
         }
     }
 
