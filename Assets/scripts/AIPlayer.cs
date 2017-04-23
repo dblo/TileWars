@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class AIPlayer : Player
@@ -17,40 +18,29 @@ public class AIPlayer : Player
         if (logicCounter <= 0)
         {
             logicCounter = 50;
-            RespawnnDeadArmies();
+            RespawnDeadArmies();
             MoveArmies();
         }
     }
 
-    private void RespawnnDeadArmies()
+    private void RespawnDeadArmies()
     {
         for (int i = 0; i < maxArmyCount - armies.Count; i++)
         {
-            SpawnArmy(GetSpawnPoint(), GetRandomArmyPrefab());
+            AddCash(Army.PurchaseCost(0));
+            TryBuyArmy(GetRandomArmyPrefab(), 0);
+            armies.Last().RandomizeStats();
         }
-    }
-
-    protected GameObject GetRandomArmyPrefab()
-    {
-        if (Random.Range(0, 2) == 0)
-            return infantryPrefab;
-        else
-            return artilleryPrefab;
     }
 
     protected override void SpawnArmies()
     {
         for (int i = 0; i < maxArmyCount; i++)
         {
-            SpawnArmy(GetSpawnPoint(), GetRandomArmyPrefab());
+            AddCash(Army.PurchaseCost(0));
+            TryBuyArmy(GetRandomArmyPrefab(), 0);
+            armies.Last().RandomizeStats();
         }
-    }
-
-    protected override Army SpawnArmy(Vector2 spawnPoint, GameObject prefab)
-    {
-        var newArmy = base.SpawnArmy(spawnPoint, prefab);
-        newArmy.RandomizeStats();
-        return newArmy;
     }
 
     private void MoveArmies()

@@ -12,6 +12,8 @@ public class Player : MonoBehaviour
     [SerializeField]
     protected GameObject infantryPrefab;
     [SerializeField]
+    protected GameObject cavalryPrefab;
+    [SerializeField]
     protected GameObject artilleryPrefab;
     protected List<Army> armies;
     [SerializeField]
@@ -20,14 +22,12 @@ public class Player : MonoBehaviour
     private const int MAX_CASH = 9999;
     [SerializeField]
     private Team team;
-
-    Text buyInfantryText;
-    Text buyCavalryText;
-    Text buyArtilleryText;
-
     // Mapped to by ArmyType for 0=Infantry, 1=Cavalry, 2=Artillery
     List<int> armyRanks = new List<int> { 0, 0, 0 };
     public bool cheater; //debug
+    Text buyInfantryText;
+    Text buyCavalryText;
+    Text buyArtilleryText;
 
     private void Awake()
     {
@@ -57,50 +57,47 @@ public class Player : MonoBehaviour
 
     public void TryBuyInfantry()
     {
-        AttemptBuyArmy(ArmyType.Infantry);
-    }
-
-    public void TryBuyArtillery()
-    {
-        AttemptBuyArmy(ArmyType.Artillery);
+        TryBuyArmy(infantryPrefab, GetInfantryRank());
     }
 
     public void TryBuyCavalry()
     {
-        AttemptBuyArmy(ArmyType.Cavalry);
+        TryBuyArmy(cavalryPrefab, GetCavalryRank());
     }
 
-    private void AttemptBuyArmy(ArmyType type)
+    public void TryBuyArtillery()
     {
-        switch (type)
+        TryBuyArmy(artilleryPrefab, GetArtilleryRank());
+    }
+
+    protected GameObject GetRandomArmyPrefab()
+    {
+        var r = UnityEngine.Random.Range(0, 3);
+        if (r == 0)
+            return infantryPrefab;
+        else if (r == 1)
+            return cavalryPrefab;
+        else
+            return artilleryPrefab;
+    }
+
+    protected bool TryBuyArmy(GameObject prefab, int armyRank)
+    {
+        if (cash >= Army.PurchaseCost(armyRank))
         {
-            case ArmyType.Infantry:
-                if (cash >= Army.PurchaseCost(GetInfantryRank()))
-                {
-                    var newArmy = SpawnArmy(GetSpawnPoint(), infantryPrefab);
-                    GameManager.Get().OnSelection(newArmy);
-                    cash -= Army.PurchaseCost(GetInfantryRank());
-                }
-                break;
-            //case ArmyType.Cavalry:
-            //    if (cash >= Army.PurchaseCost(GetCavalryRank()))
-            //    {
-            //        var newArmy = SpawnArmy(GetSpawnPoint(), );
-            //        GameManager.Get().OnSelection(newArmy);
-            //        cash -= Army.PurchaseCost(GetCavalryRank()));
-            //    }
-            //    break;
-            case ArmyType.Artillery:
-                if (cash >= Army.PurchaseCost(GetArtilleryRank()))
-                {
-                    var newArmy = SpawnArmy(GetSpawnPoint(), artilleryPrefab);
-                    GameManager.Get().OnSelection(newArmy);
-                    cash -= Army.PurchaseCost(GetArtilleryRank());
-                }
-                break;
-            default:
-                throw new System.ArgumentException();
+            var newArmy = Instantiate(prefab, transform).GetComponent<Army>();
+            newArmy.transform.position = GetSpawnPoint();
+            newArmy.SetRank(armyRank);
+            newArmy.ChangeTeam(team);
+            if (cheater)
+                newArmy.Cheat();
+
+            armies.Add(newArmy);
+            cash -= Army.PurchaseCost(armyRank);
+            GameManager.Get().OnSelection(newArmy);
+            return true;
         }
+        return false;
     }
 
     protected Vector2 GetSpawnPoint()
@@ -112,20 +109,8 @@ public class Player : MonoBehaviour
     {
         for (int i = 0; i < maxArmyCount; i++)
         {
-            SpawnArmy(GetSpawnPoint(), artilleryPrefab);
+            TryBuyArmy(GetRandomArmyPrefab(), 0);
         }
-    }
-
-    protected virtual Army SpawnArmy(Vector2 spawnPoint, GameObject prefab)
-    {
-        var newArmy = Instantiate(prefab, transform).GetComponent<Army>();
-        newArmy.transform.position = spawnPoint;
-        newArmy.ChangeTeam(team);
-        armies.Add(newArmy);
-
-        if (cheater)
-            newArmy.Cheat();
-        return newArmy;
     }
 
     internal void KillArmies(List<Army> toRemove)
@@ -183,14 +168,16 @@ public class Player : MonoBehaviour
         {
             case ArmyType.Infantry:
                 buyInfantryText.text = "Buy\nI" + (armyRank + 1) + "-$" + Army.PurchaseCost(armyRank).ToString();
-                return;
+                break;
             case ArmyType.Cavalry:
+                buyCavalryText.text = "Buy\nC" + (armyRank + 1) + "-$" + Army.PurchaseCost(armyRank).ToString();
                 break;
             case ArmyType.Artillery:
                 buyArtilleryText.text = "Buy\nA" + (armyRank + 1) + "-$" + Army.PurchaseCost(armyRank).ToString();
-                return;
+                break;
+            default:
+                throw new ArgumentException();
         }
-        throw new ArgumentException();
     }
 
     private void Upgrade(ArmyType armyType)

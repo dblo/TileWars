@@ -113,6 +113,8 @@ public abstract class Army : MonoBehaviour, ISelectableObject
     {
         if (army is Infantry)
             return ArmyType.Infantry;
+        else if (army is Cavalry)
+            return ArmyType.Cavalry;
         else if (army is Artillery)
             return ArmyType.Artillery;
         throw new System.ArgumentException();
@@ -245,10 +247,14 @@ public abstract class Army : MonoBehaviour, ISelectableObject
         UpdatePower();
     }
 
-    internal void SetLevel(int level)
+    internal void SetRank(int aRank)
     {
-        attackDamage = 2;
-        hp = 10;
+        rank = aRank;
+        UpdateAttackDamage();
+        UpdateHP();
+        UpdateSpeed();
+        UpdateRange();
+        UpdatePower();
     }
 
     internal void ChangeTeam(Team newTeam)
