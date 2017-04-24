@@ -99,17 +99,17 @@ public class GameManager : MonoBehaviour
 
     private void UpdateButtonsInteractable()
     {
-        if (p1.CanAffordArmy(ArmyType.Infantry))
+        if (p1.CanAffordArmy(ArmyType.Infantry) && TileSelected())
             buyInfantryButton.interactable = true;
         else
             buyInfantryButton.interactable = false;
 
-        if (p1.CanAffordArmy(ArmyType.Cavalry))
+        if (p1.CanAffordArmy(ArmyType.Cavalry) && TileSelected())
             buyCavalryButton.interactable = true;
         else
             buyCavalryButton.interactable = false;
 
-        if (p1.CanAffordArmy(ArmyType.Artillery))
+        if (p1.CanAffordArmy(ArmyType.Artillery) && TileSelected())
             buyArtilleryButton.interactable = true;
         else
             buyArtilleryButton.interactable = false;
