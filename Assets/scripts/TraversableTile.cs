@@ -75,8 +75,6 @@ public class TraversableTile : Tile
             renderer.color = new Color(100, 0, 0);
         else if (controllingTeam == Team.Blue)
             renderer.color = new Color(0, 0, 100);
-        else if (controllingTeam == Team.Neutral)
-            renderer.color = new Color(255, 255, 255);
         else
             throw new ArgumentException();
     }
