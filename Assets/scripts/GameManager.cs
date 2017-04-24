@@ -124,12 +124,12 @@ public class GameManager : MonoBehaviour
         foreach (var army in p2.GetArmies())
         {
             if (army.IsInCombat())
-                army.DoCombat();
+                army.AttackIfAble();
         }
         foreach (var army in p1.GetArmies())
         {
             if (army.IsInCombat())
-                army.DoCombat();
+                army.AttackIfAble();
         }
         PostCombatCleanup(p1, p2);
         PostCombatCleanup(p2, p1);

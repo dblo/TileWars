@@ -89,6 +89,7 @@ public class Player : MonoBehaviour
             newArmy.transform.position = GetSpawnPoint();
             newArmy.SetRank(armyRank);
             newArmy.ChangeTeam(team);
+
             if (cheater)
                 newArmy.Cheat();
 

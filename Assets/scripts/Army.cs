@@ -104,6 +104,7 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
             }
         }
         powerText = GetComponentInChildren<Text>();
+        UpdateHP();
     }
 
     private void Start()
@@ -252,15 +253,6 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
         UpdatePowerText();
     }
 
-    internal void TakeDamage(int damage)
-    {
-        int damageToTake = MIN_DAMAGE_TAKEN;
-        if (damage > defense)
-            damageToTake = damage - defense;
-        hp -= damageToTake;
-        UpdatePower();
-    }
-
     internal void OnEnemyInRange(Army enemy)
     {
         enemiesInRange.Add(enemy);
@@ -300,20 +292,25 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
         currentTravelPath.Add(worldCoord);
     }
 
-    internal void DoCombat()
+    internal virtual void AttackIfAble()
     {
-        if (enemiesInRange.Count > 0)
-        {
-            Assert.IsTrue(enemiesInRange[0] != null);
-            Attack(enemiesInRange[0]);
-        }
+        if (enemiesInRange.Count == 0)
+            return;
+
+        var enemy = enemiesInRange[0];
+        var damage = attackDamage * GetAttackMultiplier(enemy);
+        enemy.TakeDamage((int)Mathf.Ceil(damage));
     }
 
-    protected virtual void Attack(Army enemy)
+    protected abstract float GetAttackMultiplier(Army enemy);
+
+    internal void TakeDamage(int damage)
     {
-        enemy.TakeDamage(attackDamage);
-        enemy.UpdatePowerText();
-        //Debug.Log(team + " attacked: " + attackDamage + "dmg. " + enemy.team + " hp: " + enemy.armySize);
+        int damageToTake = MIN_DAMAGE_TAKEN;
+        if (damage > defense)
+            damageToTake = damage - defense;
+        hp -= damageToTake;
+        UpdatePower();
     }
 
     private void UpdatePowerText()

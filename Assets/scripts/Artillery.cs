@@ -72,10 +72,10 @@ public class Artillery : Army
     //    }
     //}
 
-    protected override void Attack(Army enemy)
+    internal override void AttackIfAble()
     {
         if(!Deploying())
-            base.Attack(enemy);
+            base.AttackIfAble();
     }
 
     private void SetBombardMode(bool val)
@@ -136,5 +136,12 @@ public class Artillery : Army
     protected override ReadOnlyCollection<int> GetDefenseLevels()
     {
         return defenseDamageLevels.AsReadOnly();
+    }
+
+    protected override float GetAttackMultiplier(Army enemy)
+    {
+        if (enemy is Infantry)
+            return 1.3f;
+        return 1;
     }
 }

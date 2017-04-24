@@ -44,4 +44,11 @@ public class Cavalry : Army {
     {
         return defenseDamageLevels.AsReadOnly();
     }
+
+    protected override float GetAttackMultiplier(Army enemy)
+    {
+        if (enemy is Artillery)
+            return 1.3f;
+        return 1;
+    }
 }
