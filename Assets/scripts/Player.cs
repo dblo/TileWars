@@ -230,4 +230,18 @@ public class Player : MonoBehaviour
         }
         throw new ArgumentException();
     }
+
+    internal bool CanAffordArmyUpgrade(ArmyType type)
+    {
+        switch (type)
+        {
+            case ArmyType.Infantry:
+                return cash >= Army.UpgradeCost(GetInfantryRank());
+            case ArmyType.Cavalry:
+                return cash >= Army.UpgradeCost(GetCavalryRank());
+            case ArmyType.Artillery:
+                return cash >= Army.UpgradeCost(GetArtilleryRank());
+        }
+        throw new ArgumentException();
+    }
 }

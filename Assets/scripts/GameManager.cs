@@ -26,6 +26,7 @@ public class GameManager : MonoBehaviour
     private Button buyInfantryButton;
     private Button buyCavalryButton;
     private Button buyArtilleryButton;
+    private Button upgradeButton;
 
     private static GameManager instance = null;
     private int SCORE_TO_WIN = 10000;
@@ -48,6 +49,7 @@ public class GameManager : MonoBehaviour
         buyCavalryButton = GameObject.Find("BuyCavalryButton").GetComponent<Button>();
         buyArtilleryButton = GameObject.Find("BuyArtilleryButton").GetComponent<Button>();
         tileSelectionRenderer = GameObject.Find("TileSelection").GetComponent<SpriteRenderer>();
+        upgradeButton = GameObject.Find("UpgradeButton").GetComponent<Button>();
     }
 
     // Is this reliable if called from other script's Awake()?
@@ -88,12 +90,12 @@ public class GameManager : MonoBehaviour
             }
         }
         // TODO Do this only after spending or gaining cash
-        UpdateBuyButtonsInteractable();
+        UpdateButtonsInteractable();
     }
 
-    private void UpdateBuyButtonsInteractable()
+    private void UpdateButtonsInteractable()
     {
-        if(p1.CanAffordArmy(ArmyType.Infantry))
+        if (p1.CanAffordArmy(ArmyType.Infantry))
             buyInfantryButton.interactable = true;
         else
             buyInfantryButton.interactable = false;
@@ -107,6 +109,25 @@ public class GameManager : MonoBehaviour
             buyArtilleryButton.interactable = true;
         else
             buyArtilleryButton.interactable = false;
+
+        if (ArmySelected())
+        {
+            if (p1.CanAffordArmyUpgrade(Army.ArmyToArmyType(GetSelectedArmy())))
+                upgradeButton.interactable = true;
+            else
+                upgradeButton.interactable = false;
+        }
+        else if (TileSelected())
+        {
+            if(p1.GetCash() >= GetSelectedTile().UpgradeCost())
+                upgradeButton.interactable = true;
+            else
+                upgradeButton.interactable = false;
+        }
+        else
+        {
+            upgradeButton.interactable = false;
+        }
     }
 
     private void UpdateCashScore()
@@ -242,7 +263,7 @@ public class GameManager : MonoBehaviour
         if (selectedObject != null)
         {
             var upgradeDetails = selectedObject.GetUpgradeDescriptor();
-            if(upgradeDetails != null)
+            if (upgradeDetails != null)
             {
                 upgradeText.text = "Upgrade\n" + upgradeDetails;
                 GameObject.Find("UpgradeButton").GetComponent<Button>().interactable = true;
@@ -316,7 +337,7 @@ public class GameManager : MonoBehaviour
             {
                 GetSelectedArmy().ChangeTravelPath(swipePath);
             }
-            else if(!changedSelectionThisMouseEvent)
+            else if (!changedSelectionThisMouseEvent)
             {
                 SelectTileUnderSelectedArmy();
             }

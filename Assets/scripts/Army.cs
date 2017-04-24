@@ -386,6 +386,11 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
 
     public abstract string GetUpgradeDescriptor();
 
+    internal int UpgradeCost()
+    {
+        return UpgradeCost(rank);
+    }
+
     internal static int UpgradeCost(int rank)
     {
         if (rank < upgradeCostLevels.Count)
