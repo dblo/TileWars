@@ -70,6 +70,10 @@ public class GameManager : MonoBehaviour
             p2 = p2GO.GetComponent<Player>();
 
         nextMousePoll = Time.time;
+
+        var p1pos = p1.transform.position;
+        var intialTileSelection = gameBoard.GetTile((int)p1pos.y, (int)p1pos.x);
+        OnSelection(intialTileSelection);
     }
 
     private void Update()

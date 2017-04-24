@@ -15,9 +15,6 @@ public class GameBoard : MonoBehaviour {
     private void Awake()
     {
         tiles = new List<Tile>(boardRows * boardCols);
-    }
-
-    void Start () {
         foreach (Transform trans in transform)
         {
             var tile = trans.GetComponent<Tile>();
