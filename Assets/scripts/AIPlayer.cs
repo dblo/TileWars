@@ -6,6 +6,7 @@ public class AIPlayer : Player
 {
     private int logicCounter;
     private GameBoard gameBoard;
+    public bool randomizeArmyStats;
 
     protected override void Start()
     {
@@ -29,7 +30,9 @@ public class AIPlayer : Player
         {
             AddCash(Army.PurchaseCost(0));
             TryBuyArmy(GetRandomArmyPrefab(), 0);
-            armies.Last().RandomizeStats();
+
+            if(randomizeArmyStats)
+                armies.Last().RandomizeStats();
         }
     }
 
