@@ -162,7 +162,9 @@ public class GameManager : MonoBehaviour
     internal void OnSelection(ISelectableObject obj)
     {
         if (selectedObject == obj)
+        {
             return;
+        }
 
         ClearSelection();
         if (!SelectionAllowed(obj))
@@ -223,10 +225,12 @@ public class GameManager : MonoBehaviour
                 upgradeText.text = "Upgrade\nMaxed";
                 GameObject.Find("UpgradeButton").GetComponent<Button>().interactable = false;
             }
-
         }
         else
-            upgradeText.text = "Upgrade\n-";
+        {
+            upgradeText.text = "Upgrade";
+            GameObject.Find("UpgradeButton").GetComponent<Button>().interactable = false;
+        }
     }
 
     private void ClearSelection()
@@ -240,6 +244,7 @@ public class GameManager : MonoBehaviour
     internal void OnBackgroundClicked()
     {
         ClearSelection();
+        UpdateUpgradeText();
     }
 
     private bool HasSelection()
