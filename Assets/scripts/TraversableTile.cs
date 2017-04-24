@@ -65,6 +65,7 @@ public class TraversableTile : Tile
         }
         army.TileModsChanged(null);
     }
+
     private void ChangeControllingTeam(Team team)
     {
         controllingTeam = team;
@@ -85,5 +86,15 @@ public class TraversableTile : Tile
         rank++;
         GetComponent<SpriteRenderer>().sprite = sprites[rank];
         modifiers = TileModifiersFactory.Create(tileType, rank);
+
+        foreach (var army in blueOccupants)
+        {
+            army.TileModsChanged(modifiers);
+        }
+
+        foreach (var army in redOccupants)
+        {
+            army.TileModsChanged(modifiers);
+        }
     }
 }
