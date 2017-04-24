@@ -41,7 +41,7 @@ public class Player : MonoBehaviour
     protected virtual void Start()
     {
         UpdateBuyText(ArmyType.Infantry, armyRanks[(int)ArmyType.Infantry]);
-        //UpdateBuyText(ArmyType.Cavalry, armyRanks[(int)ArmyType.Cavalry]);
+        UpdateBuyText(ArmyType.Cavalry, armyRanks[(int)ArmyType.Cavalry]);
         UpdateBuyText(ArmyType.Artillery, armyRanks[(int)ArmyType.Artillery]);
     }
 
@@ -215,5 +215,19 @@ public class Player : MonoBehaviour
     private int GetArtilleryRank()
     {
         return armyRanks[(int)ArmyType.Artillery];
+    }
+
+    internal bool CanAffordArmy(ArmyType type)
+    {
+        switch (type)
+        {
+            case ArmyType.Infantry:
+                return cash >= Army.PurchaseCost(GetInfantryRank());
+            case ArmyType.Cavalry:
+                return cash >= Army.PurchaseCost(GetCavalryRank());
+            case ArmyType.Artillery:
+                return cash >= Army.PurchaseCost(GetArtilleryRank());
+        }
+        throw new ArgumentException();
     }
 }

@@ -23,6 +23,10 @@ public class GameManager : MonoBehaviour
     private Text p2ScoreText;
     private Text upgradeText;
 
+    private Button buyInfantryButton;
+    private Button buyCavalryButton;
+    private Button buyArtilleryButton;
+
     private static GameManager instance = null;
     private int SCORE_TO_WIN = 10000;
     private bool changedSelectionThisMouseEvent;
@@ -40,6 +44,9 @@ public class GameManager : MonoBehaviour
         p2ScoreText = GameObject.Find("OpponentScoreText").GetComponent<Text>();
         p1CashText = GameObject.Find("PlayerCashText").GetComponent<Text>();
         upgradeText = GameObject.Find("UpgradeText").GetComponent<Text>();
+        buyInfantryButton = GameObject.Find("BuyInfantryButton").GetComponent<Button>();
+        buyCavalryButton = GameObject.Find("BuyCavalryButton").GetComponent<Button>();
+        buyArtilleryButton = GameObject.Find("BuyArtilleryButton").GetComponent<Button>();
         tileSelectionRenderer = GameObject.Find("TileSelection").GetComponent<SpriteRenderer>();
     }
 
@@ -76,8 +83,30 @@ public class GameManager : MonoBehaviour
             {
                 RunCombatLogic();
                 UpdateCashScore();
+                //CheckIfGameOver();
+                UpdateStandingsTexts();
             }
         }
+        // TODO Do this only after spending or gaining cash
+        UpdateBuyButtonsInteractable();
+    }
+
+    private void UpdateBuyButtonsInteractable()
+    {
+        if(p1.CanAffordArmy(ArmyType.Infantry))
+            buyInfantryButton.interactable = true;
+        else
+            buyInfantryButton.interactable = false;
+
+        if (p1.CanAffordArmy(ArmyType.Cavalry))
+            buyCavalryButton.interactable = true;
+        else
+            buyCavalryButton.interactable = false;
+
+        if (p1.CanAffordArmy(ArmyType.Artillery))
+            buyArtilleryButton.interactable = true;
+        else
+            buyArtilleryButton.interactable = false;
     }
 
     private void UpdateCashScore()
@@ -97,8 +126,6 @@ public class GameManager : MonoBehaviour
                     break;
             }
         }
-        //CheckIfGameOver();
-        UpdateUI();
     }
 
     private void CheckIfGameOver()
@@ -107,7 +134,7 @@ public class GameManager : MonoBehaviour
             RestartLevel();
     }
 
-    private void UpdateUI()
+    private void UpdateStandingsTexts()
     {
         p1CashText.text = "$ " + p1.GetCash();
         p1ScoreText.text = "P1 " + p1.GetScore();
