@@ -126,6 +126,7 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
 
     internal void OnEnteredTile(TraversableTile tile)
     {
+        OnLeftTile();
         nowInTile = tile;
         nowInTile.EnterTile(this);
     }
@@ -361,16 +362,6 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
         if (army != null && IsEnemy(army))
         {
             collidingEnemies.Remove(army);
-        }
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        var tile = collision.GetComponent<TraversableTile>();
-        if (tile != null)
-        {
-            OnLeftTile();
-            OnEnteredTile(tile);
         }
     }
 
