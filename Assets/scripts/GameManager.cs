@@ -367,6 +367,24 @@ public class GameManager : MonoBehaviour
             pos.y < gameBoard.GetRowsCount();
     }
 
+    public void TryBuyInfantry()
+    {
+        if(TileSelected())
+            p1.TryBuyArmy(ArmyType.Infantry, GetSelectedTile().transform.position);
+    }
+
+    public void TryBuyCavalry()
+    {
+        if (TileSelected())
+            p1.TryBuyArmy(ArmyType.Cavalry, GetSelectedTile().transform.position);
+    }
+
+    public void TryBuyArtillery()
+    {
+        if (TileSelected())
+            p1.TryBuyArmy(ArmyType.Artillery, GetSelectedTile().transform.position);
+    }
+
     public void TryUpgradeSelected()
     {
         if (!HasSelection())

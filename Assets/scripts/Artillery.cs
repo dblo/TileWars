@@ -15,7 +15,7 @@ public class Artillery : Army
     //private int bombardDamge;
     [SerializeField]
     private readonly float BOMBARD_MODE_BONUS = 0.5f;
-    private float deplomentTimer = 0;
+    private float deplomentTimer = DEPLOY_TIME;
     private bool inBombardMode;
     //private const float SHELL_LIFETIME = 0.7f;
     private const float DEPLOY_TIME = 3f;

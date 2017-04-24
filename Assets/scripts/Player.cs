@@ -35,7 +35,6 @@ public class Player : MonoBehaviour
         buyInfantryText = GameObject.Find("BuyInfantryText").GetComponent<Text>();
         buyCavalryText = GameObject.Find("BuyCavalryText").GetComponent<Text>();
         buyArtilleryText = GameObject.Find("BuyArtilleryText").GetComponent<Text>();
-        SpawnArmies();
     }
 
     protected virtual void Start()
@@ -55,21 +54,6 @@ public class Player : MonoBehaviour
         return cash;
     }
 
-    public void TryBuyInfantry()
-    {
-        TryBuyArmy(infantryPrefab, GetInfantryRank());
-    }
-
-    public void TryBuyCavalry()
-    {
-        TryBuyArmy(cavalryPrefab, GetCavalryRank());
-    }
-
-    public void TryBuyArtillery()
-    {
-        TryBuyArmy(artilleryPrefab, GetArtilleryRank());
-    }
-
     protected GameObject GetRandomArmyPrefab()
     {
         var r = UnityEngine.Random.Range(0, 3);
@@ -81,12 +65,32 @@ public class Player : MonoBehaviour
             return artilleryPrefab;
     }
 
-    protected virtual bool TryBuyArmy(GameObject prefab, int armyRank)
+    internal virtual bool TryBuyArmy(ArmyType armyType, Vector2 spawnPoint)
     {
+        GameObject prefab;
+        int armyRank;
+        switch (armyType)
+        {
+            case ArmyType.Infantry:
+                prefab = infantryPrefab;
+                armyRank = GetInfantryRank();
+                break;
+            case ArmyType.Cavalry:
+                prefab = cavalryPrefab;
+                armyRank = GetCavalryRank();
+                break;
+            case ArmyType.Artillery:
+                prefab = artilleryPrefab;
+                armyRank = GetArtilleryRank();
+                break;
+            default:
+                throw new ArgumentException();
+        }
+
         if (cash >= Army.PurchaseCost(armyRank))
         {
             var newArmy = Instantiate(prefab, transform).GetComponent<Army>();
-            newArmy.transform.position = GetSpawnPoint();
+            newArmy.transform.position = spawnPoint;
             newArmy.SetRank(armyRank);
             newArmy.ChangeTeam(team);
 
@@ -104,14 +108,6 @@ public class Player : MonoBehaviour
     protected Vector2 GetSpawnPoint()
     {
         return transform.position;
-    }
-
-    protected virtual void SpawnArmies()
-    {
-        for (int i = 0; i < maxArmyCount; i++)
-        {
-            TryBuyArmy(GetRandomArmyPrefab(), 0);
-        }
     }
 
     internal void KillArmies(List<Army> toRemove)

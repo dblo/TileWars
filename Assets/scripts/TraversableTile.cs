@@ -7,6 +7,7 @@ public class TraversableTile : Tile
 {
     private List<Army> redOccupants = new List<Army>();
     private List<Army> blueOccupants = new List<Army>();
+    [SerializeField]
     private Team controllingTeam = Team.Neutral;
     public TiletModifiers modifiers;
     [SerializeField]
@@ -15,6 +16,8 @@ public class TraversableTile : Tile
     private void Awake()
     {
         modifiers = TileModifiersFactory.Create(tileType, rank);
+        if(controllingTeam != Team.Neutral)
+            ChangeControllingTeam(controllingTeam);
     }
 
     public bool IsContested()
@@ -70,7 +73,6 @@ public class TraversableTile : Tile
     {
         controllingTeam = team;
         var renderer = GetComponent<SpriteRenderer>();
-
         if (controllingTeam == Team.Red)
             renderer.color = new Color(100, 0, 0);
         else if (controllingTeam == Team.Blue)

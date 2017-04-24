@@ -36,7 +36,7 @@ public class AIPlayer : Player
         }
     }
 
-    protected override void SpawnArmies()
+    protected void SpawnArmies()
     {
         for (int i = 0; i < maxArmyCount; i++)
         {
@@ -45,7 +45,7 @@ public class AIPlayer : Player
         }
     }
 
-    protected override bool TryBuyArmy(GameObject prefab, int armyRank)
+    protected bool TryBuyArmy(GameObject prefab, int armyRank)
     {
         var newArmy = Instantiate(prefab, transform).GetComponent<Army>();
         newArmy.transform.position = GetSpawnPoint();
