@@ -250,7 +250,7 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
 
     private void UpdatePower()
     {
-        power = (rank + 1) * hp;
+        power = attackDamage * hp;
         UpdatePowerText();
     }
 

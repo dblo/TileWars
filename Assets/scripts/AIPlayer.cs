@@ -42,7 +42,6 @@ public class AIPlayer : Player
         {
             AddCash(Army.PurchaseCost(0));
             TryBuyArmy(GetRandomArmyPrefab(), 0);
-            armies.Last().RandomizeStats();
         }
     }
 
