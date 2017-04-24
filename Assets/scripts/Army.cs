@@ -216,7 +216,7 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
     {
         var coll = transform.Find("RangeManager").GetComponent<CircleCollider2D>();
         coll.radius = range;
-        rangeDisplay.localScale = new Vector3(range, range);
+        rangeDisplay.localScale = new Vector3(2*range, 2*range);
     }
 
     internal void RandomizeStats()
