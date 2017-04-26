@@ -250,7 +250,7 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
 
     private void UpdatePower()
     {
-        power = attackDamage * hp;
+        power = (attackDamage + defense) * hp;
         UpdatePowerText();
     }
 
@@ -396,7 +396,7 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
         return purchaseCostLevels.Last();
     }
 
-    protected bool UpgradeMaxed()
+    internal bool UpgradeMaxed()
     {
         return rank >= upgradeCostLevels.Count;
     }

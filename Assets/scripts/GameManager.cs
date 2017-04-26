@@ -116,14 +116,14 @@ public class GameManager : MonoBehaviour
 
         if (ArmySelected())
         {
-            if (p1.CanAffordArmyUpgrade(Army.ArmyToArmyType(GetSelectedArmy())))
+            if (p1.CanAffordArmyUpgrade(Army.ArmyToArmyType(GetSelectedArmy())) && !GetSelectedArmy().UpgradeMaxed())
                 upgradeButton.interactable = true;
             else
                 upgradeButton.interactable = false;
         }
         else if (TileSelected())
         {
-            if(p1.GetCash() >= GetSelectedTile().UpgradeCost())
+            if(p1.GetCash() >= GetSelectedTile().UpgradeCost() && !GetSelectedTile().UpgradeMaxed())
                 upgradeButton.interactable = true;
             else
                 upgradeButton.interactable = false;
