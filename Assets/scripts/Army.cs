@@ -6,7 +6,7 @@ using UnityEngine.Assertions;
 using UnityEngine.UI;
 
 public enum Team { Red, Blue, Neutral };
-public enum ArmyType { Infantry = 0, Cavalry = 1, Artillery = 2};
+public enum ArmyType { Infantry = 0, Cavalry = 1, Artillery = 2 };
 
 
 public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
@@ -27,7 +27,7 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
 
     private static List<int> upgradeCostLevels = new List<int> { 100, 500, 1000 };
     private static List<int> purchaseCostLevels = new List<int> { 100, 200, 400, 800 };
-    
+
     #region Combat Stats
     private int power;
     [SerializeField]
@@ -167,7 +167,7 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
             return list[rank];
         return list.Last();
     }
-    
+
     protected virtual void UpdateAttackDamage()
     {
         attackDamage = GetItemAtRankOrLast(GetAttackDamageLevels());
@@ -216,7 +216,7 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
     {
         var coll = transform.Find("RangeManager").GetComponent<CircleCollider2D>();
         coll.radius = range;
-        rangeDisplay.localScale = new Vector3(2*range, 2*range);
+        rangeDisplay.localScale = new Vector3(2 * range, 2 * range);
     }
 
     internal void RandomizeStats()
@@ -236,7 +236,7 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
         //range = UnityEngine.Random.Range(1.5f, 1.5f);
         UpdatePower();
     }
-    
+
     internal void ChangeTeam(Team newTeam)
     {
         team = newTeam;
@@ -262,9 +262,21 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
 
     void FixedUpdate()
     {
-        if (currentTravelPath.Count > 0)// && collidingEnemies.Count == 0)
+        if (currentTravelPath.Count > 0)
         {
-            var newPos = Vector2.MoveTowards(transform.position, GetNextWaypoint(), GetSpeed());
+            var speed = GetSpeed();
+            if (collidingEnemies.Count > 0)
+                speed *= 0.5f;
+
+            // TODO This only needed for immediatly after instantiation, before ontriggerenter has executed. Get rid off
+            if (nowInTile != null)
+            {
+                var currentTileControlledBy = nowInTile.ControlledBy();
+                if (currentTileControlledBy != team && currentTileControlledBy != Team.Neutral)
+                    speed *= 0.75f;
+            }
+
+            var newPos = Vector2.MoveTowards(transform.position, GetNextWaypoint(), speed);
             transform.position = newPos;
             if (Vector2.Distance(transform.position, GetNextWaypoint()) < REACHED_WAYPOINT_DISTANCE)
             {
@@ -406,7 +418,7 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
     public void TileModsChanged(ITileCombatModifiers mods)
     {
         tileCombatMods = mods;
-        if(tileCombatMods != null)
+        if (tileCombatMods != null)
         {
             // When leaving a tile, leave the old stats to be overwritter when entered the new tile
             UpdateStats();
