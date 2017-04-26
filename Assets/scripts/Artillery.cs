@@ -6,6 +6,8 @@ using System.Collections.ObjectModel;
 
 public class Artillery : Army
 {
+    private enum DeployStatus { NOT_STARTED, STARTED, DONE };
+
     public GameObject shellPrefab;
     //[SerializeField]
     //private float reloadTime;
@@ -15,8 +17,6 @@ public class Artillery : Army
     //private int bombardDamge;
     [SerializeField]
     private readonly float BOMBARD_MODE_BONUS = 0.5f;
-    private float deplomentTimer = DEPLOY_TIME;
-    private bool inBombardMode;
     //private const float SHELL_LIFETIME = 0.7f;
     private const float DEPLOY_TIME = 3f;
 
@@ -26,27 +26,26 @@ public class Artillery : Army
     private static List<float> speedLevels = new List<float> { 0.01f, 0.02f };
     private static List<float> rangeLevels = new List<float> { 1.25f, 1.5f, 1.75f, 2f };
 
+    DeployStatus deployStatus = DeployStatus.NOT_STARTED;
+
     void Update()
     {
-        if (Deploying())
+        if (IsStationary())
         {
-            deplomentTimer -= Time.deltaTime;
-            if (deplomentTimer <= 0 && IsStationary())
+            if (deployStatus == DeployStatus.NOT_STARTED)
             {
-                SetBombardMode(true);
+                UpdateRange();
+                deployStatus = DeployStatus.STARTED;
             }
+            else if (deployStatus == DeployStatus.STARTED)
+                UpdateRange();
         }
     }
 
-    private bool Deploying()
-    {
-        return deplomentTimer > 0 && IsStationary();
-    }
-
-    private bool IsReloading()
-    {
-        return deplomentTimer > 0;
-    }
+    //private bool IsReloading()
+    //{
+    //    return deplomentTimer > 0;
+    //}
 
     //private void Bombard()
     //{
@@ -74,31 +73,56 @@ public class Artillery : Army
 
     internal override void AttackIfAble()
     {
-        if(!Deploying())
-            base.AttackIfAble();
-    }
-
-    private void SetBombardMode(bool val)
-    {
-        inBombardMode = val;
-        UpdateRange();
+        base.AttackIfAble();
     }
 
     public override void ChangeTravelPath(List<Vector2> swipePath)
     {
-        SetBombardMode(false);
-        deplomentTimer = DEPLOY_TIME;
+        if(deployStatus != DeployStatus.NOT_STARTED)
+        {
+            deployStatus = DeployStatus.NOT_STARTED;
+            UpdateRange();
+        }
         base.ChangeTravelPath(swipePath);
+    }
+
+    private float GetMaxRange()
+    {
+        return CalculateRange(true);
+    }
+
+    private float GetMinRange()
+    {
+        // Must multiply with tileBonus since mine will reduce below base
+        return rangeLevels.First() * tileCombatMods.RangeMultiplier;
     }
 
     protected override void UpdateRange()
     {
-        float tmpRange = GetItemAtRankOrLast(GetRangeLevels());
-        if (inBombardMode)
-            tmpRange += BOMBARD_MODE_BONUS;
-        tmpRange *= tileCombatMods.RangeMultiplier;
-        range = tmpRange;
+        if (deployStatus == DeployStatus.STARTED)
+        {
+            range += ((GetMaxRange() - GetMinRange()) / DEPLOY_TIME) * Time.deltaTime;
+            if (range >= GetMaxRange())
+            {
+                range = GetMaxRange();
+                deployStatus = DeployStatus.DONE;
+            }
+        }
+        else
+        {
+            range = CalculateRange(deployStatus == DeployStatus.DONE);
+        }
         OnRangeChanged();
+    }
+
+    private float CalculateRange(bool withBombardBonus)
+    {
+        float tmpRange = GetItemAtRankOrLast(GetRangeLevels());
+        if (withBombardBonus)
+            tmpRange += BOMBARD_MODE_BONUS;
+        if(tileCombatMods != null)
+            tmpRange *= tileCombatMods.RangeMultiplier;
+        return tmpRange;
     }
 
     public override string GetUpgradeDescriptor()

@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviour
     private List<Vector2> swipePath = new List<Vector2>();
     private float nextMousePoll;
     private const float MOUSE_POLL_RATE = 0.1f;
-    private const float MIN_SWIPE_TIME = 0.2f;
+    private const float MIN_SWIPE_TIME = 0.1f;
     private float swipeStartTime = -1;
 
     private Text p1CashText;
