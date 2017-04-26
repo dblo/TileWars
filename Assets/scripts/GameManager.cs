@@ -401,9 +401,10 @@ public class GameManager : MonoBehaviour
         setGamePaused(false);
     }
 
-    public void ToggleAISpawnsUnits()
+    public void SetAIMaxArmies()
     {
-        ((AIPlayer)p2).ToggleSpawnUnits(); // TODO yeha
+        var slider = GameObject.Find("AIArmyCountSlider").GetComponent<Slider>();
+        ((AIPlayer)p2).SetMaxArmiesCount((int)slider.value); // TODO yeha
     }
 
     public void ShowInGameMenu()

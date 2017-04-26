@@ -84,8 +84,8 @@ public class AIPlayer : Player
         return nextDesination;
     }
 
-    internal void ToggleSpawnUnits()
+    internal void SetMaxArmiesCount(int count)
     {
-        disableRespawningUnits = !disableRespawningUnits;
+        maxArmyCount = count;
     }
 }
