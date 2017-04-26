@@ -50,6 +50,7 @@ public class GameManager : MonoBehaviour
         buyArtilleryButton = GameObject.Find("BuyArtilleryButton").GetComponent<Button>();
         tileSelectionRenderer = GameObject.Find("TileSelection").GetComponent<SpriteRenderer>();
         upgradeButton = GameObject.Find("UpgradeButton").GetComponent<Button>();
+        setGamePaused(false);
     }
 
     // Is this reliable if called from other script's Awake()?
@@ -95,6 +96,11 @@ public class GameManager : MonoBehaviour
         }
         // TODO Do this only after spending or gaining cash
         UpdateButtonsInteractable();
+    }
+
+    private void setGamePaused(bool paused)
+    {
+        Time.timeScale = paused ? 0 : 1;
     }
 
     private void UpdateButtonsInteractable()
@@ -166,7 +172,7 @@ public class GameManager : MonoBehaviour
         p2ScoreText.text = "P2 " + p2.GetScore();
     }
 
-    public void RestartLevel()
+    private void RestartLevel()
     {
         SceneManager.LoadScene(SceneManager.GetSceneAt(0).name);
     }
@@ -387,6 +393,23 @@ public class GameManager : MonoBehaviour
     {
         if (TileSelected())
             p1.TryBuyArmy(ArmyType.Artillery, GetSelectedTile().transform.position);
+    }
+
+    public void ContinueGame()
+    {
+        GameObject.Find("MenuCanvas").GetComponent<Canvas>().enabled = false;
+        setGamePaused(false);
+    }
+
+    public void ToggleAISpawnsUnits()
+    {
+        ((AIPlayer)p2).ToggleSpawnUnits(); // TODO yeha
+    }
+
+    public void ShowInGameMenu()
+    {
+        setGamePaused(true);
+        GameObject.Find("MenuCanvas").GetComponent<Canvas>().enabled = true;
     }
 
     public void TryUpgradeSelected()

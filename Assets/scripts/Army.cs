@@ -203,7 +203,8 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
 
     private void OnDestroy()
     {
-        nowInTile.LeaveTile(this);
+        if(nowInTile)
+            nowInTile.LeaveTile(this);
     }
 
     internal void OnEnemiesKilled(List<Army> armiesPendingRemoval)

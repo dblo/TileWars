@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -7,6 +8,7 @@ public class AIPlayer : Player
     private int logicCounter;
     private GameBoard gameBoard;
     public bool randomizeArmyStats;
+    private bool disableRespawningUnits;
 
     protected override void Start()
     {
@@ -26,12 +28,15 @@ public class AIPlayer : Player
 
     private void RespawnDeadArmies()
     {
+        if (disableRespawningUnits)
+            return;
+
         for (int i = 0; i < maxArmyCount - armies.Count; i++)
         {
             AddCash(Army.PurchaseCost(0));
             TryBuyArmy(GetRandomArmyPrefab(), 0);
 
-            if(randomizeArmyStats)
+            if (randomizeArmyStats)
                 armies.Last().RandomizeStats();
         }
     }
@@ -72,10 +77,15 @@ public class AIPlayer : Player
         TraversableTile nextDesination = null;
         while (nextDesination == null)
         {
-            var col = Random.Range(0, gameBoard.GetColsCount());
-            var row = Random.Range(0, gameBoard.GetRowsCount());
+            var col = UnityEngine.Random.Range(0, gameBoard.GetColsCount());
+            var row = UnityEngine.Random.Range(0, gameBoard.GetRowsCount());
             nextDesination = gameBoard.GetTile(row, col);
         }
         return nextDesination;
+    }
+
+    internal void ToggleSpawnUnits()
+    {
+        disableRespawningUnits = !disableRespawningUnits;
     }
 }
