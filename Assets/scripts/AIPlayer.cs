@@ -8,7 +8,6 @@ public class AIPlayer : Player
     private int logicCounter;
     private GameBoard gameBoard;
     public bool randomizeArmyStats;
-    private bool disableRespawningUnits;
     public const string MAX_AI_ARMIES = "MaxArmiesAI";
     public const int DEFAULT_MAX_ARMIES = 2;
 
@@ -36,9 +35,6 @@ public class AIPlayer : Player
 
     private void RespawnDeadArmies()
     {
-        if (disableRespawningUnits)
-            return;
-
         for (int i = 0; i < maxArmyCount - armies.Count; i++)
         {
             AddCash(Army.PurchaseCost(0));
