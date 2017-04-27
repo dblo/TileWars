@@ -16,7 +16,7 @@ public class TraversableTile : Tile
     private void Awake()
     {
         modifiers = TileModifiersFactory.Create(tileType, rank);
-        if(controllingTeam != Team.Neutral)
+        if (controllingTeam != Team.Neutral)
             ChangeControllingTeam(controllingTeam);
     }
 
@@ -43,8 +43,12 @@ public class TraversableTile : Tile
         }
         else
         {
-            ChangeControllingTeam(army.GetTeam());
-            GameManager.Get().OnTileControlChanged(this);
+            if (controllingTeam != army.GetTeam())
+            {
+                Team formedController = controllingTeam;
+                ChangeControllingTeam(army.GetTeam());
+                GameManager.Get().OnTileControlChanged(this, formedController);
+            }
         }
         army.TileModsChanged(modifiers);
     }
@@ -81,7 +85,7 @@ public class TraversableTile : Tile
         else
             throw new ArgumentException();
     }
-    
+
     internal override void Upgrade()
     {
         rank++;

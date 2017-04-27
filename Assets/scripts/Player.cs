@@ -28,6 +28,22 @@ public class Player : MonoBehaviour
     Text buyInfantryText;
     Text buyCavalryText;
     Text buyArtilleryText;
+    private int controllingTilesCount;
+
+    public int ControllingTilesCount
+    {
+        get { return controllingTilesCount; }
+    }
+
+    internal void IncrementControlledTiles()
+    {
+        controllingTilesCount++;
+    }
+
+    internal void DecementControlledTiles()
+    {
+        controllingTilesCount--;
+    }
 
     protected virtual void Awake()
     {

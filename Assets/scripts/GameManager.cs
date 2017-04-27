@@ -10,8 +10,10 @@ public class GameManager : MonoBehaviour
     private ISelectableObject selectedObject;
     private float logicCounter = 0;
     private const int COMBAT_LOGIC_INTERVAL = 1;
-    private Player p1;
-    private AIPlayer p2;
+    [SerializeField]
+    private Player bluePlayer;
+    [SerializeField]
+    private AIPlayer redPlayer;
     private List<Vector2> swipePath = new List<Vector2>();
     private float nextMousePoll;
     private const float MOUSE_POLL_RATE = 0.1f;
@@ -32,6 +34,7 @@ public class GameManager : MonoBehaviour
     private int SCORE_TO_WIN = 10000;
     private bool changedSelectionThisMouseEvent;
     private SpriteRenderer tileSelectionRenderer;
+    private bool winnable = true;
 
     private void Awake()
     {
@@ -51,13 +54,7 @@ public class GameManager : MonoBehaviour
         tileSelectionRenderer = GameObject.Find("TileSelection").GetComponent<SpriteRenderer>();
         upgradeButton = GameObject.Find("UpgradeButton").GetComponent<Button>();
         SetGamePaused(false);
-
         gameBoard = FindObjectOfType<GameBoard>();
-        p1 = GameObject.Find("Player").GetComponent<Player>();
-
-        var p2GO = GameObject.Find("AIPlayer");
-        if (p2GO != null)
-            p2 = p2GO.GetComponent<AIPlayer>();
 
         var slider = GameObject.Find("AIArmyCountSlider").GetComponent<Slider>();
         var maxArmyCount = PlayerPrefs.GetInt(AIPlayer.MAX_AI_ARMIES, AIPlayer.DEFAULT_MAX_ARMIES);
@@ -75,9 +72,21 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         nextMousePoll = Time.time;
-        var p1pos = p1.transform.position;
+        var p1pos = bluePlayer.transform.position;
         var intialTileSelection = gameBoard.GetTile((int)p1pos.y, (int)p1pos.x);
         OnSelectionChange(intialTileSelection);
+        InitPlayerTileControl();
+    }
+
+    private void InitPlayerTileControl()
+    {
+        foreach (var tile in gameBoard.GetTraversableTiles())
+        {
+            if (tile.ControlledBy() == Team.Blue)
+                bluePlayer.IncrementControlledTiles();
+            else if (tile.ControlledBy() == Team.Red)
+                redPlayer.IncrementControlledTiles();
+        }
     }
 
     private void Update()
@@ -89,11 +98,11 @@ public class GameManager : MonoBehaviour
         if (logicCounter <= 0)
         {
             logicCounter = COMBAT_LOGIC_INTERVAL;
-            if (p1 && p2) // TODO disable for release?
+            if (bluePlayer && redPlayer) // TODO disable for release?
             {
                 RunCombatLogic();
                 UpdateCashScore();
-                //CheckIfGameOver();
+                CheckIfGameOverByScore();
                 UpdateStandingsTexts();
             }
         }
@@ -101,10 +110,32 @@ public class GameManager : MonoBehaviour
         UpdateButtonsInteractable();
     }
 
-    internal void OnTileControlChanged(TraversableTile tile)
+    internal void OnTileControlChanged(TraversableTile tile, Team formerControllingTeam)
     {
         if (GetSelectedTile() == tile)
             OnSelectionChange(null);
+
+        if (tile.ControlledBy() == Team.Blue)
+        {
+            bluePlayer.IncrementControlledTiles();
+            if (formerControllingTeam == Team.Red)
+                redPlayer.DecementControlledTiles();
+            CheckIfGameOverByTiles();
+        }
+        else if (tile.ControlledBy() == Team.Red)
+        {
+            redPlayer.IncrementControlledTiles();
+            if (formerControllingTeam == Team.Blue)
+                bluePlayer.DecementControlledTiles();
+            CheckIfGameOverByTiles();
+        }
+        else
+            throw new ArgumentException();
+    }
+
+    public void ToggleWinnable()
+    {
+        winnable = !winnable;
     }
 
     private void SetGamePaused(bool paused)
@@ -114,31 +145,31 @@ public class GameManager : MonoBehaviour
 
     private void UpdateButtonsInteractable()
     {
-        if (p1.CanAffordArmy(ArmyType.Infantry) && TileSelected())
+        if (bluePlayer.CanAffordArmy(ArmyType.Infantry) && TileSelected())
             buyInfantryButton.interactable = true;
         else
             buyInfantryButton.interactable = false;
 
-        if (p1.CanAffordArmy(ArmyType.Cavalry) && TileSelected())
+        if (bluePlayer.CanAffordArmy(ArmyType.Cavalry) && TileSelected())
             buyCavalryButton.interactable = true;
         else
             buyCavalryButton.interactable = false;
 
-        if (p1.CanAffordArmy(ArmyType.Artillery) && TileSelected())
+        if (bluePlayer.CanAffordArmy(ArmyType.Artillery) && TileSelected())
             buyArtilleryButton.interactable = true;
         else
             buyArtilleryButton.interactable = false;
 
         if (ArmySelected())
         {
-            if (p1.CanAffordArmyUpgrade(Army.ArmyToArmyType(GetSelectedArmy())) && !GetSelectedArmy().UpgradeMaxed())
+            if (bluePlayer.CanAffordArmyUpgrade(Army.ArmyToArmyType(GetSelectedArmy())) && !GetSelectedArmy().UpgradeMaxed())
                 upgradeButton.interactable = true;
             else
                 upgradeButton.interactable = false;
         }
         else if (TileSelected())
         {
-            if(p1.GetCash() >= GetSelectedTile().UpgradeCost() && !GetSelectedTile().UpgradeMaxed())
+            if(bluePlayer.GetCash() >= GetSelectedTile().UpgradeCost() && !GetSelectedTile().UpgradeMaxed())
                 upgradeButton.interactable = true;
             else
                 upgradeButton.interactable = false;
@@ -157,28 +188,40 @@ public class GameManager : MonoBehaviour
             switch (tile.ControlledBy())
             {
                 case Team.Red:
-                    p2.AddCash(tile.modifiers.CashValue);
-                    p2.AddScore(tile.modifiers.ScoreValues);
+                    redPlayer.AddCash(tile.modifiers.CashValue);
+                    redPlayer.AddScore(tile.modifiers.ScoreValues);
                     break;
                 case Team.Blue:
-                    p1.AddCash(tile.modifiers.CashValue);
-                    p1.AddScore(tile.modifiers.ScoreValues);
+                    bluePlayer.AddCash(tile.modifiers.CashValue);
+                    bluePlayer.AddScore(tile.modifiers.ScoreValues);
                     break;
             }
         }
     }
 
-    private void CheckIfGameOver()
+    private void CheckIfGameOverByTiles()
     {
-        if (p1.GetScore() >= SCORE_TO_WIN || p2.GetScore() >= SCORE_TO_WIN)
+        if (!winnable)
+            return;
+        var controllableTilesCount = gameBoard.GetTraversableTiles().Count;
+        if (bluePlayer.ControllingTilesCount == controllableTilesCount || 
+            redPlayer.ControllingTilesCount == controllableTilesCount)
+            RestartLevel();
+    }
+
+    private void CheckIfGameOverByScore()
+    {
+        if (!winnable)
+            return;
+        if (bluePlayer.GetScore() >= SCORE_TO_WIN || redPlayer.GetScore() >= SCORE_TO_WIN)
             RestartLevel();
     }
 
     private void UpdateStandingsTexts()
     {
-        p1CashText.text = "$ " + p1.GetCash();
-        p1ScoreText.text = "P1 " + p1.GetScore();
-        p2ScoreText.text = "P2 " + p2.GetScore();
+        p1CashText.text = "$ " + bluePlayer.GetCash();
+        p1ScoreText.text = "Blue " + bluePlayer.GetScore();
+        p2ScoreText.text = "Red " + redPlayer.GetScore();
     }
 
     private void RestartLevel()
@@ -188,18 +231,18 @@ public class GameManager : MonoBehaviour
 
     private void RunCombatLogic()
     {
-        foreach (var army in p2.GetArmies())
+        foreach (var army in redPlayer.GetArmies())
         {
             if (army.IsInCombat())
                 army.AttackIfAble();
         }
-        foreach (var army in p1.GetArmies())
+        foreach (var army in bluePlayer.GetArmies())
         {
             if (army.IsInCombat())
                 army.AttackIfAble();
         }
-        PostCombatCleanup(p1, p2);
-        PostCombatCleanup(p2, p1);
+        PostCombatCleanup(bluePlayer, redPlayer);
+        PostCombatCleanup(redPlayer, bluePlayer);
     }
 
     private void PostCombatCleanup(Player playerA, Player playerB)
@@ -392,19 +435,19 @@ public class GameManager : MonoBehaviour
     public void TryBuyInfantry()
     {
         if(TileSelected())
-            p1.TryBuyArmy(ArmyType.Infantry, GetSelectedTile().transform.position);
+            bluePlayer.TryBuyArmy(ArmyType.Infantry, GetSelectedTile().transform.position);
     }
 
     public void TryBuyCavalry()
     {
         if (TileSelected())
-            p1.TryBuyArmy(ArmyType.Cavalry, GetSelectedTile().transform.position);
+            bluePlayer.TryBuyArmy(ArmyType.Cavalry, GetSelectedTile().transform.position);
     }
 
     public void TryBuyArtillery()
     {
         if (TileSelected())
-            p1.TryBuyArmy(ArmyType.Artillery, GetSelectedTile().transform.position);
+            bluePlayer.TryBuyArmy(ArmyType.Artillery, GetSelectedTile().transform.position);
     }
 
     public void ContinueGame()
@@ -416,7 +459,7 @@ public class GameManager : MonoBehaviour
     public void SetAIMaxArmies()
     {
         var slider = GameObject.Find("AIArmyCountSlider").GetComponent<Slider>();
-        p2.SetMaxArmiesCount((int)slider.value); // TODO yeha
+        redPlayer.SetMaxArmiesCount((int)slider.value); // TODO yeha
     }
 
     public void ShowInGameMenu() 
@@ -433,14 +476,14 @@ public class GameManager : MonoBehaviour
         if (ArmySelected())
         {
             var armyType = Army.ArmyToArmyType(GetSelectedArmy());
-            if (p1.TryUpgrade(armyType))
+            if (bluePlayer.TryUpgrade(armyType))
             {
                 UpdateUpgradeText();
             }
         }
         else if (TileSelected())
         {
-            if (p1.TryUpgrade(GetSelectedTile()))
+            if (bluePlayer.TryUpgrade(GetSelectedTile()))
             {
                 UpdateUpgradeText();
             }
