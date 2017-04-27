@@ -50,7 +50,7 @@ public class GameManager : MonoBehaviour
         buyArtilleryButton = GameObject.Find("BuyArtilleryButton").GetComponent<Button>();
         tileSelectionRenderer = GameObject.Find("TileSelection").GetComponent<SpriteRenderer>();
         upgradeButton = GameObject.Find("UpgradeButton").GetComponent<Button>();
-        setGamePaused(false);
+        SetGamePaused(false);
 
         gameBoard = FindObjectOfType<GameBoard>();
         p1 = GameObject.Find("Player").GetComponent<Player>();
@@ -77,7 +77,7 @@ public class GameManager : MonoBehaviour
         nextMousePoll = Time.time;
         var p1pos = p1.transform.position;
         var intialTileSelection = gameBoard.GetTile((int)p1pos.y, (int)p1pos.x);
-        OnSelection(intialTileSelection);
+        OnSelectionChange(intialTileSelection);
     }
 
     private void Update()
@@ -101,7 +101,13 @@ public class GameManager : MonoBehaviour
         UpdateButtonsInteractable();
     }
 
-    private void setGamePaused(bool paused)
+    internal void OnTileControlChanged(TraversableTile tile)
+    {
+        if (GetSelectedTile() == tile)
+            OnSelectionChange(null);
+    }
+
+    private void SetGamePaused(bool paused)
     {
         Time.timeScale = paused ? 0 : 1;
     }
@@ -220,7 +226,7 @@ public class GameManager : MonoBehaviour
         return GetSelectedArmy() == army;
     }
 
-    internal void OnSelection(ISelectableObject obj)
+    internal void OnSelectionChange(ISelectableObject obj)
     {
         if (selectedObject == obj)
         {
@@ -260,6 +266,9 @@ public class GameManager : MonoBehaviour
 
     private bool SelectionAllowed(ISelectableObject obj)
     {
+        if (obj == null)
+            return false;
+
         if (obj is Army)
         {
             return (obj as Army).GetTeam() == Team.Blue;
@@ -364,7 +373,7 @@ public class GameManager : MonoBehaviour
     {
         var pos = GetSelectedArmy().transform.position;
         var tileUnderObj = gameBoard.GetTile((int)pos.y, (int)pos.x);
-        OnSelection(tileUnderObj);
+        OnSelectionChange(tileUnderObj);
     }
 
     private bool DidGesture()
@@ -401,7 +410,7 @@ public class GameManager : MonoBehaviour
     public void ContinueGame()
     {
         GameObject.Find("MenuCanvas").GetComponent<Canvas>().enabled = false;
-        setGamePaused(false);
+        SetGamePaused(false);
     }
 
     public void SetAIMaxArmies()
@@ -412,7 +421,7 @@ public class GameManager : MonoBehaviour
 
     public void ShowInGameMenu() 
     {
-        setGamePaused(true);
+        SetGamePaused(true);
         GameObject.Find("MenuCanvas").GetComponent<Canvas>().enabled = true;
     }
 

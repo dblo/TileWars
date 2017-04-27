@@ -44,6 +44,7 @@ public class TraversableTile : Tile
         else
         {
             ChangeControllingTeam(army.GetTeam());
+            GameManager.Get().OnTileControlChanged(this);
         }
         army.TileModsChanged(modifiers);
     }

@@ -38,7 +38,7 @@ public class Tile : MonoBehaviour, ISelectableObject
 
     private void OnMouseDown()
     {
-        GameManager.Get().OnSelection(this);
+        GameManager.Get().OnSelectionChange(this);
     }
 
     public string GetUpgradeDescriptor()

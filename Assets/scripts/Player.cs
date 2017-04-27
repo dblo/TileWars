@@ -99,7 +99,7 @@ public class Player : MonoBehaviour
 
             armies.Add(newArmy);
             cash -= Army.PurchaseCost(armyRank);
-            GameManager.Get().OnSelection(newArmy);
+            GameManager.Get().OnSelectionChange(newArmy);
             return true;
         }
         return false;

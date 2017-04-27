@@ -340,7 +340,7 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
 
     protected virtual void OnMouseDown()
     {
-        GameManager.Get().OnSelection(this);
+        GameManager.Get().OnSelectionChange(this);
     }
 
     public virtual void ChangeTravelPath(List<Vector2> swipePath)
