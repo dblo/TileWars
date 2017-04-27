@@ -29,7 +29,7 @@ public class Player : MonoBehaviour
     Text buyCavalryText;
     Text buyArtilleryText;
 
-    private void Awake()
+    protected virtual void Awake()
     {
         armies = new List<Army>(maxArmyCount);
         buyInfantryText = GameObject.Find("BuyInfantryText").GetComponent<Text>();

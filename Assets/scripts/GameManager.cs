@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour
     private float logicCounter = 0;
     private const int COMBAT_LOGIC_INTERVAL = 1;
     private Player p1;
-    private Player p2;
+    private AIPlayer p2;
     private List<Vector2> swipePath = new List<Vector2>();
     private float nextMousePoll;
     private const float MOUSE_POLL_RATE = 0.1f;
@@ -51,6 +51,17 @@ public class GameManager : MonoBehaviour
         tileSelectionRenderer = GameObject.Find("TileSelection").GetComponent<SpriteRenderer>();
         upgradeButton = GameObject.Find("UpgradeButton").GetComponent<Button>();
         setGamePaused(false);
+
+        gameBoard = FindObjectOfType<GameBoard>();
+        p1 = GameObject.Find("Player").GetComponent<Player>();
+
+        var p2GO = GameObject.Find("AIPlayer");
+        if (p2GO != null)
+            p2 = p2GO.GetComponent<AIPlayer>();
+
+        var slider = GameObject.Find("AIArmyCountSlider").GetComponent<Slider>();
+        var maxArmyCount = PlayerPrefs.GetInt(AIPlayer.MAX_AI_ARMIES, AIPlayer.DEFAULT_MAX_ARMIES);
+        slider.value = maxArmyCount;
     }
 
     // Is this reliable if called from other script's Awake()?
@@ -63,15 +74,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        gameBoard = FindObjectOfType<GameBoard>();
-        p1 = GameObject.Find("Player").GetComponent<Player>();
-
-        var p2GO = GameObject.Find("AIPlayer");
-        if (p2GO != null)
-            p2 = p2GO.GetComponent<Player>();
-
         nextMousePoll = Time.time;
-
         var p1pos = p1.transform.position;
         var intialTileSelection = gameBoard.GetTile((int)p1pos.y, (int)p1pos.x);
         OnSelection(intialTileSelection);
@@ -404,10 +407,10 @@ public class GameManager : MonoBehaviour
     public void SetAIMaxArmies()
     {
         var slider = GameObject.Find("AIArmyCountSlider").GetComponent<Slider>();
-        ((AIPlayer)p2).SetMaxArmiesCount((int)slider.value); // TODO yeha
+        p2.SetMaxArmiesCount((int)slider.value); // TODO yeha
     }
 
-    public void ShowInGameMenu()
+    public void ShowInGameMenu() 
     {
         setGamePaused(true);
         GameObject.Find("MenuCanvas").GetComponent<Canvas>().enabled = true;

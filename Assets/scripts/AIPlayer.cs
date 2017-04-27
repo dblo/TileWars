@@ -9,6 +9,14 @@ public class AIPlayer : Player
     private GameBoard gameBoard;
     public bool randomizeArmyStats;
     private bool disableRespawningUnits;
+    public const string MAX_AI_ARMIES = "MaxArmiesAI";
+    public const int DEFAULT_MAX_ARMIES = 2;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        maxArmyCount = PlayerPrefs.GetInt(MAX_AI_ARMIES, DEFAULT_MAX_ARMIES);
+    }
 
     protected override void Start()
     {
@@ -87,5 +95,6 @@ public class AIPlayer : Player
     internal void SetMaxArmiesCount(int count)
     {
         maxArmyCount = count;
+        PlayerPrefs.SetInt(MAX_AI_ARMIES, count);
     }
 }
