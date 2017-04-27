@@ -90,6 +90,14 @@ public class AIPlayer : Player
 
     internal void SetMaxArmiesCount(int count)
     {
+        if (count < maxArmyCount && armies != null)
+        {
+            for (int i = armies.Count - 1; i >= count; i--)
+            {
+                Destroy(armies.Last().gameObject);
+                armies.RemoveAt(armies.Count - 1);
+            }
+        }
         maxArmyCount = count;
         PlayerPrefs.SetInt(MAX_AI_ARMIES, count);
     }
