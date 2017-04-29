@@ -49,11 +49,11 @@ public class Tile : MonoBehaviour, ISelectableObject
         switch (tileType)
         {
             case TileType.Plain:
-                return "P" + (rank + 1) + "-$" + UpgradeCost();
+                return "Pla $" + UpgradeCost();
             case TileType.Hill:
-                return "H" + (rank + 1) + "-$" + UpgradeCost();
+                return "Hil $" + UpgradeCost();
             case TileType.Mine:
-                return "M" + (rank + 1) + "-$" + UpgradeCost();
+                return "Min $" + UpgradeCost();
         }
         throw new ArgumentException();
     }

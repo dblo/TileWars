@@ -12,7 +12,7 @@ public class Cavalry : Army {
     {
         if (UpgradeMaxed())
             return null;
-        return "C" + (rank + 1) + "-$" + UpgradeCost(rank);
+        return "Cav $" + UpgradeCost(rank);
     }
 
     internal override bool IsType(ArmyType type)

@@ -14,7 +14,7 @@ public class Infantry : Army
     {
         if (UpgradeMaxed())
             return null;
-        return "I" + (rank + 1) + "-$" + UpgradeCost(rank);
+        return "Inf $" + UpgradeCost(rank);
     }
 
     internal override bool IsType(ArmyType type)

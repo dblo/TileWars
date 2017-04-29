@@ -192,13 +192,13 @@ public class Player : MonoBehaviour
         switch (armyType)
         {
             case ArmyType.Infantry:
-                buyInfantryText.text = "Buy\nI" + (armyRank + 1) + "-$" + Army.PurchaseCost(armyRank).ToString();
+                buyInfantryText.text = "Buy Inf\n" + "$" + Army.PurchaseCost(armyRank).ToString();
                 break;
             case ArmyType.Cavalry:
-                buyCavalryText.text = "Buy\nC" + (armyRank + 1) + "-$" + Army.PurchaseCost(armyRank).ToString();
+                buyCavalryText.text = "Buy Cav\n" + "$" + Army.PurchaseCost(armyRank).ToString();
                 break;
             case ArmyType.Artillery:
-                buyArtilleryText.text = "Buy\nA" + (armyRank + 1) + "-$" + Army.PurchaseCost(armyRank).ToString();
+                buyArtilleryText.text = "Buy Art\n" + "$" + Army.PurchaseCost(armyRank).ToString();
                 break;
             default:
                 throw new ArgumentException();
