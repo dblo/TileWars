@@ -23,8 +23,8 @@ public class Artillery : Army
     private static List<int> attackDamageLevels = new List<int> { 2, 4, 8, 16 };
     private static List<int> defenseDamageLevels = new List<int> { 1, 2, 3, 4 };
     private static List<int> hpLevels = new List<int> { 3, 6, 9, 12 };
-    private static List<float> speedLevels = new List<float> { 0.01f, 0.02f };
-    private static List<float> rangeLevels = new List<float> { 1.25f, 1.5f, 1.75f, 2f };
+    private static List<float> speedLevels = new List<float> { 0.005f, 0.01f, 0.015f };
+    private static List<float> rangeLevels = new List<float> { 1f, 1.25f, 1.5f, 2f };
 
     DeployStatus deployStatus = DeployStatus.NOT_STARTED;
 

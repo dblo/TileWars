@@ -5,7 +5,7 @@ public class Cavalry : Army {
     private static List<int> attackDamageLevels = new List<int> { 1, 2, 4, 8 };
     private static List<int> defenseDamageLevels = new List<int> { 1, 2, 3, 4 };
     private static List<int> hpLevels = new List<int> { 4, 8, 12, 16 };
-    private static List<float> speedLevels = new List<float> { 0.04f, 0.05f, 0.06f };
+    private static List<float> speedLevels = new List<float> { 0.02f, 0.03f, 0.04f };
     private static List<float> rangeLevels = new List<float> { 0.6f, 0.8f, 1f, 1.25f };
 
     public override string GetUpgradeDescriptor()
