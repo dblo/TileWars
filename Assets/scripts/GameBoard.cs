@@ -67,8 +67,6 @@ public class GameBoard : MonoBehaviour {
         {
             for (int j = lowerY; j <= upperY; j++)
             {
-                var trans1 = tile.transform;
-
                 if (GetTile(j, i).ControlledBy() == InquiringTeam)
                 {
                     var trans2 = GetTile(j, i).transform;

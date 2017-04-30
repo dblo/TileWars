@@ -293,6 +293,11 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetSceneAt(0).name);
     }
 
+    public void GoToMainMenu()
+    {
+        SceneManager.LoadScene("mainmenu");
+    }
+
     private void RunCombatLogic()
     {
         foreach (var army in redPlayer.GetArmies())

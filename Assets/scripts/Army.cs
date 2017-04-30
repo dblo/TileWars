@@ -9,7 +9,6 @@ using UnityEngine.UI;
 public enum Team { Red, Blue, Neutral };
 public enum ArmyType { Infantry = 0, Cavalry = 1, Artillery = 2 };
 
-
 public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
 {
     private const double REACHED_WAYPOINT_DISTANCE = .05;
