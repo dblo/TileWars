@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -9,7 +10,7 @@ public class GameManager : MonoBehaviour
     private GameBoard gameBoard;
     private ISelectableObject selectedObject;
     private float logicCounter = 0;
-    private const float COMBAT_LOGIC_INTERVAL = 0.25f;
+    private const float COMBAT_LOGIC_INTERVAL = 1f;
     [SerializeField]
     private Player bluePlayer;
     [SerializeField]
@@ -35,6 +36,7 @@ public class GameManager : MonoBehaviour
     private bool changedSelectionThisMouseEvent;
     private SpriteRenderer tileSelectionRenderer;
     private bool winnable;
+    private static readonly float ARMY_UPDATE_INTERVAL = 0.2f;
 
     private void Awake()
     {
@@ -80,6 +82,7 @@ public class GameManager : MonoBehaviour
         var intialTileSelection = gameBoard.GetTile((int)p1pos.y, (int)p1pos.x);
         OnSelectionChange(intialTileSelection);
         InitPlayerTileControl();
+        StartArmyUpdates();
     }
 
     private void InitPlayerTileControl()
@@ -102,35 +105,70 @@ public class GameManager : MonoBehaviour
         if (logicCounter <= 0)
         {
             logicCounter = COMBAT_LOGIC_INTERVAL;
-            if (bluePlayer && redPlayer) // TODO disable for release?
-            {
-                RunCombatLogic();
-                UpdateCashScore();
-                CheckIfGameOverByScore();
-                UpdateStandingsTexts();
-                UpdateFoW();
-            }
+            RunCombatLogic();
+            UpdateCashScore();
+            UpdateStandingsTexts();
+            CheckIfGameOverByScore();
         }
         // TODO Do this only after spending or gaining cash
         UpdateButtonsInteractable();
     }
 
-    private void UpdateFoW()
+    void StartArmyUpdates()
     {
-        foreach (var tile in gameBoard.GetTraversableTiles())
+        StartCoroutine("UpdateVisibleArmies");
+        StartCoroutine("UpdateFoW");
+    }
+
+    // An enemy army is visible when it is in a visible tile or when it is in range of a friendly army
+    IEnumerator UpdateVisibleArmies()
+    {
+        while (true)
         {
-            if (tile.ControlledBy() == Team.Blue || tile.IsContested())
+            foreach (var army in redPlayer.GetArmies())
             {
-                tile.SetVisible(true);
+                if (army.GetInTile().GetVisible())
+                    army.SetVisible(true);
+                else
+                    army.SetVisible(false);
+
             }
-            else if (gameBoard.IsFrontlinetile(tile, Team.Blue))
+            var visibleArmies = new HashSet<Army>();
+            foreach (var army in bluePlayer.GetArmies())
             {
-                tile.SetVisible(true);
+                foreach (var armyInRange in army.GetEnemiesInRange())
+                {
+                    visibleArmies.Add(armyInRange);
+                }
             }
-            else
+            foreach (var army in visibleArmies)
             {
-                tile.SetVisible(false);
+                army.SetVisible(true);
             }
+            yield return new WaitForSeconds(ARMY_UPDATE_INTERVAL);
+        }
+    }
+
+    IEnumerator UpdateFoW()
+    {
+        while (true)
+        {
+            foreach (var tile in gameBoard.GetTraversableTiles())
+            {
+                if (tile.ControlledBy() == Team.Blue || tile.IsContested())
+                {
+                    tile.SetVisible(true);
+                }
+                else if (gameBoard.IsFrontlinetile(tile, Team.Blue))
+                {
+                    tile.SetVisible(true);
+                }
+                else
+                {
+                    tile.SetVisible(false);
+                }
+            }
+            yield return new WaitForSeconds(ARMY_UPDATE_INTERVAL);
         }
     }
 

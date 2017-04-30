@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using UnityEngine;
@@ -93,6 +94,11 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
     }
     #endregion
 
+    internal TraversableTile GetInTile()
+    {
+        return nowInTile;
+    }
+
     protected virtual void Awake()
     {
         foreach (Transform trans in transform)
@@ -171,6 +177,11 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
         UpdateHP();
     }
 
+    internal ReadOnlyCollection<Army> GetEnemiesInRange()
+    {
+        return enemiesInRange.AsReadOnly();
+    }
+
     internal void SetRank(int aRank)
     {
         rank = aRank;
@@ -184,6 +195,12 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
         UpdateSpeed();
         UpdateRange();
         UpdatePower();
+    }
+
+    internal void SetVisible(bool IsVisible)
+    {
+        GetComponent<SpriteRenderer>().enabled = IsVisible;
+        GetComponentInChildren<Canvas>().enabled = IsVisible;
     }
 
     protected T GetItemAtRankOrLast<T>(ReadOnlyCollection<T> list)

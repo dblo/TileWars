@@ -17,6 +17,7 @@ public class TraversableTile : Tile
     private static readonly Color GREEN = new Color(35 / 255f, 175 / 255f, 76 / 255f);
     private static readonly Color RED = new Color(255 / 255f, 0, 0);
     private static readonly Color BLUE = new Color(0, 0, 255 / 255f);
+    private bool isVisible;
 
     private void Awake()
     {
@@ -109,11 +110,17 @@ public class TraversableTile : Tile
         }
     }
 
-    internal void SetVisible(bool isVisible)
+    internal void SetVisible(bool aIsVisible)
     {
+        isVisible = aIsVisible;
         var renderer = fog.GetComponent<SpriteRenderer>();
         var color = renderer.color;
-        color.a = isVisible ? 0 : 0.5f;
+        color.a = aIsVisible ? 0 : 0.5f;
         renderer.color = color;
+    }
+
+    internal bool GetVisible()
+    {
+        return isVisible;
     }
 }

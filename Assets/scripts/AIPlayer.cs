@@ -60,6 +60,7 @@ public class AIPlayer : Player
         newArmy.transform.position = GetSpawnPoint();
         newArmy.SetRank(armyRank);
         newArmy.ChangeTeam(team);
+        newArmy.SetVisible(false);
         armies.Add(newArmy);
         return true;
     }
