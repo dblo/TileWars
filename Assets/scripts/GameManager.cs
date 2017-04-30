@@ -39,7 +39,7 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         if (instance != null)
-            throw new System.Exception("GameManager can nly exist on a single GameObject");
+            throw new System.Exception("GameManager can only exist on a single GameObject");
 
         instance = this;
         Screen.sleepTimeout = SleepTimeout.NeverSleep;

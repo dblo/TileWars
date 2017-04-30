@@ -113,6 +113,31 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
         OnRangeChanged();
     }
 
+    void FixedUpdate()
+    {
+        if (currentTravelPath.Count > 0)
+        {
+            var speed = GetSpeed();
+            if (collidingEnemies.Count > 0)
+                speed *= 0.5f;
+
+            // TODO This only needed for immediatly after instantiation, before ontriggerenter has executed. Get rid off
+            if (nowInTile != null)
+            {
+                var currentTileControlledBy = nowInTile.ControlledBy();
+                if (currentTileControlledBy != team && currentTileControlledBy != Team.Neutral)
+                    speed *= 0.75f;
+            }
+
+            var newPos = Vector2.MoveTowards(transform.position, GetNextWaypoint(), speed);
+            transform.position = newPos;
+            if (Vector2.Distance(transform.position, GetNextWaypoint()) < REACHED_WAYPOINT_DISTANCE)
+            {
+                currentTravelPath.RemoveAt(0);
+            }
+        }
+    }
+
     internal static ArmyType ArmyToArmyType(Army army)
     {
         if (army is Infantry)
@@ -259,31 +284,6 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
     {
         enemiesInRange.Add(enemy);
         inCombat = true;
-    }
-
-    void FixedUpdate()
-    {
-        if (currentTravelPath.Count > 0)
-        {
-            var speed = GetSpeed();
-            if (collidingEnemies.Count > 0)
-                speed *= 0.5f;
-
-            // TODO This only needed for immediatly after instantiation, before ontriggerenter has executed. Get rid off
-            if (nowInTile != null)
-            {
-                var currentTileControlledBy = nowInTile.ControlledBy();
-                if (currentTileControlledBy != team && currentTileControlledBy != Team.Neutral)
-                    speed *= 0.75f;
-            }
-
-            var newPos = Vector2.MoveTowards(transform.position, GetNextWaypoint(), speed);
-            transform.position = newPos;
-            if (Vector2.Distance(transform.position, GetNextWaypoint()) < REACHED_WAYPOINT_DISTANCE)
-            {
-                currentTravelPath.RemoveAt(0);
-            }
-        }
     }
 
     internal void OnEnemyOutOfRange(Army army)
