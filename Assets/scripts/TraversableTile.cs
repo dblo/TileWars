@@ -13,11 +13,14 @@ public class TraversableTile : Tile
     [SerializeField]
     protected List<Sprite> sprites;
 
+    private readonly Color GREEN = new Color(35 / 255f, 175 / 255f, 76 / 255f);
+    private readonly Color RED = new Color(255 / 255f, 0, 0);
+    private readonly Color BLUE = new Color(0, 0, 255 / 255f);
+
     private void Awake()
     {
         modifiers = TileModifiersFactory.Create(tileType, rank);
-        if (controllingTeam != Team.Neutral)
-            ChangeControllingTeam(controllingTeam);
+        ChangeControllingTeam(controllingTeam);
     }
 
     public bool IsContested()
@@ -79,9 +82,11 @@ public class TraversableTile : Tile
         controllingTeam = team;
         var renderer = GetComponent<SpriteRenderer>();
         if (controllingTeam == Team.Red)
-            renderer.color = new Color(100, 0, 0);
+            renderer.color = RED;
         else if (controllingTeam == Team.Blue)
-            renderer.color = new Color(0, 0, 100);
+            renderer.color = BLUE;
+        else if (controllingTeam == Team.Neutral)
+            renderer.color = GREEN;
         else
             throw new ArgumentException();
     }
