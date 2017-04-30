@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public class GameBoard : MonoBehaviour {
     [SerializeField]
@@ -19,10 +20,16 @@ public class GameBoard : MonoBehaviour {
         {
             var tile = trans.GetComponent<Tile>();
             if (tile)
+            {
+                // All tiles to be anchored at integer points
+                Assert.IsTrue(tile.transform.position.x < Mathf.Ceil(tile.transform.position.x));
+                Assert.IsTrue(tile.transform.position.y < Mathf.Ceil(tile.transform.position.y));
                 tiles.Add(tile);
+            }
         }
         tiles = tiles.OrderBy(y => y.transform.position.y).ThenBy(x => x.transform.position.x).ToList();
         traverseableTiles = tiles.OfType<TraversableTile>().ToList();
+        Assert.IsTrue(tiles.Count == boardRows * boardCols);
     }
 
     internal int GetColsCount()
