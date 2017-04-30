@@ -10,7 +10,7 @@ public class GameManager : MonoBehaviour
     private GameBoard gameBoard;
     private ISelectableObject selectedObject;
     private float logicCounter = 0;
-    private const float COMBAT_LOGIC_INTERVAL = 1f;
+    private const float COMBAT_LOGIC_INTERVAL = 2f;
     [SerializeField]
     private Player bluePlayer;
     [SerializeField]
@@ -37,6 +37,7 @@ public class GameManager : MonoBehaviour
     private SpriteRenderer tileSelectionRenderer;
     private bool winnable;
     private static readonly float ARMY_UPDATE_INTERVAL = 0.2f;
+    private float armyUpdateCounter;
 
     private void Awake()
     {
@@ -82,7 +83,6 @@ public class GameManager : MonoBehaviour
         var intialTileSelection = gameBoard.GetTile((int)p1pos.y, (int)p1pos.x);
         OnSelectionChange(intialTileSelection);
         InitPlayerTileControl();
-        StartArmyUpdates();
     }
 
     private void InitPlayerTileControl()
@@ -109,66 +109,61 @@ public class GameManager : MonoBehaviour
             UpdateCashScore();
             UpdateStandingsTexts();
             CheckIfGameOverByScore();
+
         }
         // TODO Do this only after spending or gaining cash
         UpdateButtonsInteractable();
-    }
 
-    void StartArmyUpdates()
-    {
-        StartCoroutine("UpdateVisibleArmies");
-        StartCoroutine("UpdateFoW");
-    }
-
-    // An enemy army is visible when it is in a visible tile or when it is in range of a friendly army
-    IEnumerator UpdateVisibleArmies()
-    {
-        while (true)
+        armyUpdateCounter -= Time.deltaTime;
+        if (armyUpdateCounter <= 0)
         {
-            foreach (var army in redPlayer.GetArmies())
-            {
-                if (army.GetInTile().GetVisible())
-                    army.SetVisible(true);
-                else
-                    army.SetVisible(false);
-
-            }
-            var visibleArmies = new HashSet<Army>();
-            foreach (var army in bluePlayer.GetArmies())
-            {
-                foreach (var armyInRange in army.GetEnemiesInRange())
-                {
-                    visibleArmies.Add(armyInRange);
-                }
-            }
-            foreach (var army in visibleArmies)
-            {
-                army.SetVisible(true);
-            }
-            yield return new WaitForSeconds(ARMY_UPDATE_INTERVAL);
+            UpdateVisibleArmies();
+            UpdateFoW();
+            armyUpdateCounter = ARMY_UPDATE_INTERVAL;
         }
     }
 
-    IEnumerator UpdateFoW()
+    // An enemy army is visible when it is in a visible tile or when it is in range of a friendly army
+    void UpdateVisibleArmies()
     {
-        while (true)
+        foreach (var army in redPlayer.GetArmies())
         {
-            foreach (var tile in gameBoard.GetTraversableTiles())
+            if (army.GetInTile().GetVisible())
+                army.SetVisible(true);
+            else
+                army.SetVisible(false);
+
+        }
+        var visibleArmies = new HashSet<Army>();
+        foreach (var army in bluePlayer.GetArmies())
+        {
+            foreach (var armyInRange in army.GetEnemiesInRange())
             {
-                if (tile.ControlledBy() == Team.Blue || tile.IsContested())
-                {
-                    tile.SetVisible(true);
-                }
-                else if (gameBoard.IsFrontlinetile(tile, Team.Blue))
-                {
-                    tile.SetVisible(true);
-                }
-                else
-                {
-                    tile.SetVisible(false);
-                }
+                visibleArmies.Add(armyInRange);
             }
-            yield return new WaitForSeconds(ARMY_UPDATE_INTERVAL);
+        }
+        foreach (var army in visibleArmies)
+        {
+            army.SetVisible(true);
+        }
+    }
+
+    void UpdateFoW()
+    {
+        foreach (var tile in gameBoard.GetTraversableTiles())
+        {
+            if (tile.ControlledBy() == Team.Blue || tile.IsContested())
+            {
+                tile.SetVisible(true);
+            }
+            else if (gameBoard.IsFrontlinetile(tile, Team.Blue))
+            {
+                tile.SetVisible(true);
+            }
+            else
+            {
+                tile.SetVisible(false);
+            }
         }
     }
 

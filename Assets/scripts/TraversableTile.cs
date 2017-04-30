@@ -12,12 +12,12 @@ public class TraversableTile : Tile
     public TiletModifiers modifiers;
     [SerializeField]
     protected List<Sprite> sprites;
+    private bool isVisible;
     public GameObject fog;
 
     private static readonly Color GREEN = new Color(35 / 255f, 175 / 255f, 76 / 255f);
     private static readonly Color RED = new Color(255 / 255f, 0, 0);
     private static readonly Color BLUE = new Color(0, 0, 255 / 255f);
-    private bool isVisible;
 
     private void Awake()
     {
