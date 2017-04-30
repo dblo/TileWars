@@ -26,7 +26,7 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
     protected int rank = 0; // Shown as rank+1 in-game
 
     private static List<int> upgradeCostLevels = new List<int> { 100, 500, 1000 };
-    private static List<int> purchaseCostLevels = new List<int> { 100, 200, 400, 800 };
+    private static List<int> purchaseCostLevels = new List<int> { 50, 100, 200, 400 };
 
     #region Combat Stats
     private int power;
@@ -93,9 +93,14 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
     }
     #endregion
 
-    internal TraversableTile GetInTile()
+    internal bool InVisibleTile()
     {
-        return nowInTile;
+        if(nowInTile)
+        {
+            // May get here if inquiring right after this was spawned, before ontriggerenter has registered intile
+            return nowInTile.GetVisible();
+        }
+        return false;
     }
 
     protected virtual void Awake()

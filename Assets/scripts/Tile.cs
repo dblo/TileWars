@@ -12,7 +12,7 @@ public class Tile : MonoBehaviour, ISelectableObject
     protected TileType tileType;
     protected int rank = 0;
     
-    private static List<int> upgradeCostLevels = new List<int> { 100, 500, 1000 };
+    private static List<int> upgradeCostLevels = new List<int> { 50 };
 
     public void Select()
     {

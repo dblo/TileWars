@@ -10,7 +10,7 @@ public class GameManager : MonoBehaviour
     private GameBoard gameBoard;
     private ISelectableObject selectedObject;
     private float logicCounter = 0;
-    private const float COMBAT_LOGIC_INTERVAL = 2f;
+    private const float COMBAT_LOGIC_INTERVAL = 1f;
     [SerializeField]
     private Player bluePlayer;
     [SerializeField]
@@ -128,7 +128,7 @@ public class GameManager : MonoBehaviour
     {
         foreach (var army in redPlayer.GetArmies())
         {
-            if (army.GetInTile().GetVisible())
+            if (army.InVisibleTile())
                 army.SetVisible(true);
             else
                 army.SetVisible(false);
