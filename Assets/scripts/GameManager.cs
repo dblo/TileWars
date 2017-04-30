@@ -34,7 +34,7 @@ public class GameManager : MonoBehaviour
     private int SCORE_TO_WIN = 10000;
     private bool changedSelectionThisMouseEvent;
     private SpriteRenderer tileSelectionRenderer;
-    private bool winnable = true;
+    private bool winnable;
 
     private void Awake()
     {
@@ -59,6 +59,10 @@ public class GameManager : MonoBehaviour
         var slider = GameObject.Find("AIArmyCountSlider").GetComponent<Slider>();
         var maxArmyCount = PlayerPrefs.GetInt(AIPlayer.MAX_AI_ARMIES, AIPlayer.DEFAULT_MAX_ARMIES);
         slider.value = maxArmyCount;
+
+        winnable = Convert.ToBoolean(PlayerPrefs.GetInt("Winnable", 1));
+        var winnableToggle = GameObject.Find("WinnableToggle").GetComponent<Toggle>();
+        winnableToggle.isOn = winnable;
     }
 
     // Is this reliable if called from other script's Awake()?
@@ -115,7 +119,7 @@ public class GameManager : MonoBehaviour
     {
         foreach (var tile in gameBoard.GetTraversableTiles())
         {
-            if(tile.ControlledBy() == Team.Blue || tile.IsContested())
+            if (tile.ControlledBy() == Team.Blue || tile.IsContested())
             {
                 tile.SetVisible(true);
             }
@@ -153,9 +157,11 @@ public class GameManager : MonoBehaviour
             throw new ArgumentException();
     }
 
-    public void ToggleWinnable()
+    public void OnWinnableToggled()
     {
-        winnable = !winnable;
+        var winnableToggle = GameObject.Find("WinnableToggle").GetComponent<Toggle>();
+        winnable = winnableToggle.isOn;
+        PlayerPrefs.SetInt("Winnable", Convert.ToInt32(winnable));
     }
 
     private void SetGamePaused(bool paused)
@@ -189,7 +195,7 @@ public class GameManager : MonoBehaviour
         }
         else if (TileSelected())
         {
-            if(bluePlayer.GetCash() >= GetSelectedTile().UpgradeCost() && !GetSelectedTile().UpgradeMaxed())
+            if (bluePlayer.GetCash() >= GetSelectedTile().UpgradeCost() && !GetSelectedTile().UpgradeMaxed())
                 upgradeButton.interactable = true;
             else
                 upgradeButton.interactable = false;
@@ -224,7 +230,7 @@ public class GameManager : MonoBehaviour
         if (!winnable)
             return;
         var controllableTilesCount = gameBoard.GetTraversableTiles().Count;
-        if (bluePlayer.ControllingTilesCount == controllableTilesCount || 
+        if (bluePlayer.ControllingTilesCount == controllableTilesCount ||
             redPlayer.ControllingTilesCount == controllableTilesCount)
             RestartLevel();
     }
@@ -454,7 +460,7 @@ public class GameManager : MonoBehaviour
 
     public void TryBuyInfantry()
     {
-        if(TileSelected())
+        if (TileSelected())
             bluePlayer.TryBuyArmy(ArmyType.Infantry, GetSelectedTile().transform.position);
     }
 
@@ -482,7 +488,7 @@ public class GameManager : MonoBehaviour
         redPlayer.SetMaxArmiesCount((int)slider.value); // TODO yeha
     }
 
-    public void ShowInGameMenu() 
+    public void ShowInGameMenu()
     {
         SetGamePaused(true);
         GameObject.Find("MenuCanvas").GetComponent<Canvas>().enabled = true;
