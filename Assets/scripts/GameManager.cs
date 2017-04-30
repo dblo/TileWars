@@ -9,7 +9,7 @@ public class GameManager : MonoBehaviour
     private GameBoard gameBoard;
     private ISelectableObject selectedObject;
     private float logicCounter = 0;
-    private const int COMBAT_LOGIC_INTERVAL = 1;
+    private const float COMBAT_LOGIC_INTERVAL = 0.25f;
     [SerializeField]
     private Player bluePlayer;
     [SerializeField]
@@ -104,10 +104,30 @@ public class GameManager : MonoBehaviour
                 UpdateCashScore();
                 CheckIfGameOverByScore();
                 UpdateStandingsTexts();
+                UpdateFoW();
             }
         }
         // TODO Do this only after spending or gaining cash
         UpdateButtonsInteractable();
+    }
+
+    private void UpdateFoW()
+    {
+        foreach (var tile in gameBoard.GetTraversableTiles())
+        {
+            if(tile.ControlledBy() == Team.Blue || tile.IsContested())
+            {
+                tile.SetVisible(true);
+            }
+            else if (gameBoard.IsFrontlinetile(tile, Team.Blue))
+            {
+                tile.SetVisible(true);
+            }
+            else
+            {
+                tile.SetVisible(false);
+            }
+        }
     }
 
     internal void OnTileControlChanged(TraversableTile tile, Team formerControllingTeam)

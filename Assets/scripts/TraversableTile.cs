@@ -12,10 +12,11 @@ public class TraversableTile : Tile
     public TiletModifiers modifiers;
     [SerializeField]
     protected List<Sprite> sprites;
+    public GameObject fog;
 
-    private readonly Color GREEN = new Color(35 / 255f, 175 / 255f, 76 / 255f);
-    private readonly Color RED = new Color(255 / 255f, 0, 0);
-    private readonly Color BLUE = new Color(0, 0, 255 / 255f);
+    private static readonly Color GREEN = new Color(35 / 255f, 175 / 255f, 76 / 255f);
+    private static readonly Color RED = new Color(255 / 255f, 0, 0);
+    private static readonly Color BLUE = new Color(0, 0, 255 / 255f);
 
     private void Awake()
     {
@@ -106,5 +107,13 @@ public class TraversableTile : Tile
         {
             army.TileModsChanged(modifiers);
         }
+    }
+
+    internal void SetVisible(bool isVisible)
+    {
+        var renderer = fog.GetComponent<SpriteRenderer>();
+        var color = renderer.color;
+        color.a = isVisible ? 0 : 0.5f;
+        renderer.color = color;
     }
 }

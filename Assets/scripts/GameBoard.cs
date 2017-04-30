@@ -54,4 +54,28 @@ public class GameBoard : MonoBehaviour {
     {
         return traverseableTiles.AsReadOnly();
     }
+
+    internal bool IsFrontlinetile(TraversableTile tile, Team InquiringTeam)
+    {
+        var tilePos = tile.transform.position;
+        int leftCol = (int)Mathf.Clamp(tilePos.x - 1, 0, tilePos.x);
+        int rightCol = (int)Mathf.Clamp(tilePos.x + 1, tilePos.x, boardCols - 1);
+        int lowerY = (int)Mathf.Clamp(tilePos.y - 1, 0, tilePos.y);
+        int upperY = (int)Mathf.Clamp(tilePos.y + 1, tilePos.y, boardRows - 1);
+
+        for (int i = leftCol; i <= rightCol; i++)
+        {
+            for (int j = lowerY; j <= upperY; j++)
+            {
+                var trans1 = tile.transform;
+
+                if (GetTile(j, i).ControlledBy() == InquiringTeam)
+                {
+                    var trans2 = GetTile(j, i).transform;
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }
