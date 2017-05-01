@@ -42,19 +42,19 @@ public class AIPlayer : Player
         switch (armyRanks[(int)type])
         {
             case 0:
-                if (score >= 1000)
+                if (score >= 3000)
                 {
                     TryUpgrade(type);
                 }
                 break;
             case 1:
-                if (score >= 4000)
+                if (score >= 6000)
                 {
                     TryUpgrade(type);
                 }
                 break;
             case 2:
-                if (score >= 7000)
+                if (score >= 9000)
                 {
                     TryUpgrade(type);
                 }

@@ -65,7 +65,7 @@ public static class TileModifiersFactory
 
     private static List<float> sMineRangeModifiers = new List<float> { 0.6f, 0.8f, 1, 1.2f };
     private static List<float> sMineDefenseModifiers = new List<float> { 0.6f, 0.8f, 1, 1.2f };
-    private static List<int> sMineCashValues = new List<int> { 2, 4, 8, 16 };
+    private static List<int> sMineCashValues = new List<int> { 4, 8, 12, 16 };
     private static List<int> sMineScoreValues = new List<int> { 1, 2, 4, 6 };
 
     public static TiletModifiers Create(TileType type, int rank)
