@@ -32,6 +32,7 @@ public class GameManager : MonoBehaviour
     private Button upgradeButton;
 
     private static GameManager instance = null;
+    [SerializeField]
     private int SCORE_TO_WIN = 10000;
     private bool changedSelectionThisMouseEvent;
     private SpriteRenderer tileSelectionRenderer;
@@ -263,17 +264,49 @@ public class GameManager : MonoBehaviour
         if (!winnable)
             return;
         var controllableTilesCount = gameBoard.GetTraversableTiles().Count;
-        if (bluePlayer.ControllingTilesCount == controllableTilesCount ||
-            redPlayer.ControllingTilesCount == controllableTilesCount)
-            RestartLevel();
+        if (bluePlayer.ControllingTilesCount == controllableTilesCount)
+        {
+            OnPlayerWon(Team.Blue);
+        }
+        else if (redPlayer.ControllingTilesCount == controllableTilesCount)
+        {
+            OnPlayerWon(Team.Blue);
+        }
     }
 
     private void CheckIfGameOverByScore()
     {
         if (!winnable)
             return;
-        if (bluePlayer.GetScore() >= SCORE_TO_WIN || redPlayer.GetScore() >= SCORE_TO_WIN)
-            RestartLevel();
+        if (bluePlayer.GetScore() >= SCORE_TO_WIN)
+        {
+            OnPlayerWon(Team.Blue);
+        }
+        else if (redPlayer.GetScore() >= SCORE_TO_WIN)
+        {
+            OnPlayerWon(Team.Red);
+        }
+    }
+
+    private void OnPlayerWon(Team winningTeam)
+    {
+        SetGamePaused(true);
+        var winnerText = GameObject.Find("WinnerText").GetComponent<Text>();
+        if (winningTeam == Team.Blue)
+        {
+            winnerText.text = "Blue Player Wins!";
+            winnerText.color = TraversableTile.BLUE;
+        }
+        else if (winningTeam == Team.Red)
+        {
+            winnerText.text = "Red Player Wins!";
+            winnerText.color = TraversableTile.RED;
+        }
+        else
+            throw new ArgumentException();
+
+        var canvas = GameObject.Find("GameOverCanvas").GetComponent<Canvas>();
+        canvas.enabled = true;
     }
 
     private void UpdateStandingsTexts()
