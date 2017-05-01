@@ -11,8 +11,9 @@ public enum ArmyType { Infantry = 0, Cavalry = 1, Artillery = 2 };
 
 public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
 {
-    private const double REACHED_WAYPOINT_DISTANCE = .05;
-    protected readonly float HILL_RANGE_MULTIPLIER = 1.5f;
+    private static float REACHED_WAYPOINT_DISTANCE = .05f;
+    protected static float HILL_RANGE_MULTIPLIER = 1.5f;
+    protected static float FAVORED_COMBAT_BONUS = 1.3f;
 
     [SerializeField]
     protected Team team;
@@ -42,6 +43,8 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
     protected float range;
     protected ITileCombatModifiers tileCombatMods;
     private const int MIN_DAMAGE_TAKEN = 1;
+    private int maxHP;
+    private int regen = 1;
     #endregion
 
     #region Getters/Setters/Predicates
@@ -95,7 +98,7 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
 
     internal bool InVisibleTile()
     {
-        if(nowInTile)
+        if (nowInTile)
         {
             // May get here if inquiring right after this was spawned, before ontriggerenter has registered intile
             return nowInTile.GetVisible();
@@ -114,7 +117,8 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
             }
         }
         powerText = GetComponentInChildren<Text>();
-        UpdateHP();
+        UpdateMaxHP();
+        hp = maxHP;
     }
 
     private void Start()
@@ -174,11 +178,19 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
         nowInTile.LeaveTile(this);
     }
 
+    internal void Regen()
+    {
+        if (hp >= maxHP) return;
+        hp = Mathf.Clamp(hp + regen, hp, maxHP);
+        UpdatePower();
+
+    }
+
     internal void Upgrade()
     {
         rank++;
         UpdateStats();
-        UpdateHP();
+        UpdateMaxHP();
     }
 
     internal ReadOnlyCollection<Army> GetEnemiesInRange()
@@ -224,9 +236,9 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
         defense = (int)(GetItemAtRankOrLast(GetDefenseLevels()) * tileCombatMods.DefenceMultiplier);
     }
 
-    protected virtual void UpdateHP()
+    protected virtual void UpdateMaxHP()
     {
-        hp = GetItemAtRankOrLast(GetHPLevels());
+        maxHP = GetItemAtRankOrLast(GetHPLevels());
     }
 
     protected virtual void UpdateSpeed()
@@ -249,7 +261,7 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
 
     private void OnDestroy()
     {
-        if(nowInTile)
+        if (nowInTile)
             nowInTile.LeaveTile(this);
     }
 
@@ -345,7 +357,6 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
         if (damage > defense)
             damageToTake = damage - defense;
         hp -= damageToTake;
-        UpdatePower();
     }
 
     private void UpdatePowerText()

@@ -4,9 +4,9 @@ using System;
 
 public class Infantry : Army
 {
-    private static List<int> attackDamageLevels = new List<int> { 1, 2, 4, 8 };
+    private static List<int> attackDamageLevels = new List<int> { 3, 6, 9, 12 };
     private static List<int> defenseDamageLevels = new List<int> { 1, 2, 3, 4 };
-    private static List<int> hpLevels = new List<int> { 4, 8, 12, 16 };
+    private static List<int> hpLevels = new List<int> { 10, 20, 30, 40 };
     private static List<float> speedLevels = new List<float> { 0.01f, 0.02f, 0.03f};
     private static List<float> rangeLevels = new List<float> { 0.75f, 1f, 1.25f, 1.55f };
 

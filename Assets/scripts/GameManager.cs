@@ -108,6 +108,7 @@ public class GameManager : MonoBehaviour
             UpdateCashScore();
             UpdateStandingsTexts();
             CheckIfGameOverByScore();
+            RegenArmies();
             nextEverySecondTime = Time.time + 1;
         }
         // TODO Do this only after spending or gaining cash
@@ -118,6 +119,18 @@ public class GameManager : MonoBehaviour
             UpdateVisibleArmies();
             UpdateFoW();
             nextVisibilityTime = Time.time + ARMY_UPDATE_INTERVAL;
+        }
+    }
+
+    private void RegenArmies()
+    {
+        foreach (var army in bluePlayer.GetArmies())
+        {
+            army.Regen();
+        }
+        foreach (var army in redPlayer.GetArmies())
+        {
+            army.Regen();
         }
     }
 
