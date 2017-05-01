@@ -8,13 +8,13 @@ public class AIPlayer : Player
     private int logicCounter;
     private GameBoard gameBoard;
     public bool randomizeArmyStats;
-    public const string MAX_AI_ARMIES = "MaxArmiesAI";
-    public const int DEFAULT_MAX_ARMIES = 2;
+    public static string MAX_AI_ARMIES = "MaxArmiesAI";
+    public static int DEFAULT_MAX_ARMIES = 2;
 
     protected override void Awake()
     {
         base.Awake();
-        maxArmyCount = PlayerPrefs.GetInt(MAX_AI_ARMIES, DEFAULT_MAX_ARMIES);
+        maxArmyCount = PlayerPrefs.GetInt(AIPlayer.MAX_AI_ARMIES, DEFAULT_MAX_ARMIES);
     }
 
     protected override void Start()
@@ -30,7 +30,52 @@ public class AIPlayer : Player
             logicCounter = 50;
             RespawnDeadArmies();
             MoveArmies();
+
+            TryUpgradeDifficulty(ArmyType.Infantry);
+            TryUpgradeDifficulty(ArmyType.Cavalry);
+            TryUpgradeDifficulty(ArmyType.Artillery);
         }
+    }
+
+    private void TryUpgradeDifficulty(ArmyType type)
+    {
+        switch (armyRanks[(int)type])
+        {
+            case 0:
+                if (score >= 1000)
+                {
+                    TryUpgrade(type);
+                }
+                break;
+            case 1:
+                if (score >= 4000)
+                {
+                    TryUpgrade(type);
+                }
+                break;
+            case 2:
+                if (score >= 7000)
+                {
+                    TryUpgrade(type);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    internal override bool TryUpgrade(ArmyType armyType)
+    {
+        var armyRank = armyRanks[(int)armyType];
+        var upgradeCost = Army.UpgradeCost(armyRank);
+        if (upgradeCost <= cash)
+        {
+            UpgradeArmiesOfType(armyType);
+            cash -= upgradeCost;
+            armyRanks[(int)armyType]++;
+            return true;
+        }
+        return false;
     }
 
     private void RespawnDeadArmies()

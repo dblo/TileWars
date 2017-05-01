@@ -17,13 +17,13 @@ public class Player : MonoBehaviour
     protected GameObject artilleryPrefab;
     protected List<Army> armies;
     [SerializeField]
-    private int cash;
-    private int score;
+    protected int cash;
+    protected int score;
     private const int MAX_CASH = 9999;
     [SerializeField]
     protected Team team;
     // Mapped to by ArmyType for 0=Infantry, 1=Cavalry, 2=Artillery
-    List<int> armyRanks = new List<int> { 0, 0, 0 };
+    protected List<int> armyRanks = new List<int> { 0, 0, 0 };
     public bool cheater; //debug
     Text buyInfantryText;
     Text buyCavalryText;
@@ -172,13 +172,13 @@ public class Player : MonoBehaviour
         return false;
     }
 
-    internal bool TryUpgrade(ArmyType armyType)
+    internal virtual bool TryUpgrade(ArmyType armyType)
     {
         var armyRank = armyRanks[(int)armyType];
         var upgradeCost = Army.UpgradeCost(armyRank);
         if (upgradeCost <= cash)
         {
-            Upgrade(armyType);
+            UpgradeArmiesOfType(armyType);
             cash -= upgradeCost;
             armyRanks[(int)armyType]++;
             UpdateBuyText(armyType, armyRanks[(int)armyType]);
@@ -205,7 +205,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void Upgrade(ArmyType armyType)
+    protected void UpgradeArmiesOfType(ArmyType armyType)
     {
         foreach (var army in armies)
         {

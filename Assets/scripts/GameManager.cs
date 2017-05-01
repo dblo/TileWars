@@ -280,7 +280,7 @@ public class GameManager : MonoBehaviour
         }
         else if (redPlayer.ControllingTilesCount == controllableTilesCount)
         {
-            OnPlayerWon(Team.Blue);
+            OnPlayerWon(Team.Red);
         }
     }
 
