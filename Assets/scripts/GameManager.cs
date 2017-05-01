@@ -9,7 +9,8 @@ public class GameManager : MonoBehaviour
 {
     private GameBoard gameBoard;
     private ISelectableObject selectedObject;
-    private float logicCounter = 0;
+    private float nextEverySecondTime = 0;
+    private float nextVisibilityTime = 0;
     private const float COMBAT_LOGIC_INTERVAL = 1f;
     [SerializeField]
     private Player bluePlayer;
@@ -38,7 +39,6 @@ public class GameManager : MonoBehaviour
     private SpriteRenderer tileSelectionRenderer;
     private bool winnable;
     private static readonly float ARMY_UPDATE_INTERVAL = 0.2f;
-    private float armyUpdateCounter;
 
     private void Awake()
     {
@@ -102,25 +102,22 @@ public class GameManager : MonoBehaviour
         if (ArmySelected())
             ProcessGesturForSelectedArmy();
 
-        logicCounter -= Time.deltaTime;
-        if (logicCounter <= 0)
+        if (nextEverySecondTime <= Time.time)
         {
-            logicCounter = COMBAT_LOGIC_INTERVAL;
             RunCombatLogic();
             UpdateCashScore();
             UpdateStandingsTexts();
             CheckIfGameOverByScore();
-
+            nextEverySecondTime = Time.time + 1;
         }
         // TODO Do this only after spending or gaining cash
         UpdateButtonsInteractable();
 
-        armyUpdateCounter -= Time.deltaTime;
-        if (armyUpdateCounter <= 0)
+        if (nextVisibilityTime <= Time.time)
         {
             UpdateVisibleArmies();
             UpdateFoW();
-            armyUpdateCounter = ARMY_UPDATE_INTERVAL;
+            nextVisibilityTime = Time.time + ARMY_UPDATE_INTERVAL;
         }
     }
 
