@@ -39,6 +39,7 @@ public class GameManager : MonoBehaviour
     private SpriteRenderer tileSelectionRenderer;
     private bool winnable;
     private static readonly float ARMY_UPDATE_INTERVAL = 0.2f;
+    private bool gamePaused;
 
     private void Awake()
     {
@@ -210,6 +211,7 @@ public class GameManager : MonoBehaviour
 
     private void SetGamePaused(bool paused)
     {
+        gamePaused = paused;
         Time.timeScale = paused ? 0 : 1;
     }
 
@@ -288,13 +290,20 @@ public class GameManager : MonoBehaviour
     {
         if (!winnable)
             return;
-        if (bluePlayer.GetScore() >= SCORE_TO_WIN)
+        if (bluePlayer.GetScore() >= SCORE_TO_WIN || redPlayer.GetScore() >= SCORE_TO_WIN)
         {
-            OnPlayerWon(Team.Blue);
-        }
-        else if (redPlayer.GetScore() >= SCORE_TO_WIN)
-        {
-            OnPlayerWon(Team.Red);
+            if(bluePlayer.GetScore() > redPlayer.GetScore())
+            {
+                OnPlayerWon(Team.Blue);
+            }
+            else if(bluePlayer.GetScore() < redPlayer.GetScore())
+            {
+                OnPlayerWon(Team.Red);
+            }
+            else
+            {
+                OnPlayerWon(Team.Neutral); // Game tied
+            }
         }
     }
 
@@ -311,6 +320,11 @@ public class GameManager : MonoBehaviour
         {
             winnerText.text = "Red Player Wins!";
             winnerText.color = TraversableTile.RED;
+        }
+        else if(winningTeam == Team.Neutral)
+        {
+            winnerText.text = "Game Tied!";
+            winnerText.color = TraversableTile.GREEN;
         }
         else
             throw new ArgumentException();
@@ -378,7 +392,7 @@ public class GameManager : MonoBehaviour
 
     internal void OnSelectionChange(ISelectableObject obj)
     {
-        if (selectedObject == obj)
+        if (gamePaused || selectedObject == obj)
         {
             return;
         }
