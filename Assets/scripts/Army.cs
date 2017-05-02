@@ -190,7 +190,6 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
     {
         rank++;
         UpdateStats();
-        UpdateMaxHP();
     }
 
     internal ReadOnlyCollection<Army> GetEnemiesInRange()
@@ -203,7 +202,6 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
         rank = aRank;
     }
 
-    // Update stats except for HP
     private void UpdateStats()
     {
         UpdateAttackDamage();
@@ -211,6 +209,7 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
         UpdateSpeed();
         UpdateRange();
         UpdatePower();
+        UpdateMaxHP();
     }
 
     internal void SetVisible(bool IsVisible)
