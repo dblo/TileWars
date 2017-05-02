@@ -52,7 +52,8 @@ public class AIPlayer : Player
         for (int i = 0; i < maxArmyCount - armies.Count; i++)
         {
             AddCash(Army.PurchaseCost(0));
-            TryBuyArmy(GetRandomArmyPrefab(), 0);
+            var newArmyType = GetRandomArmyType();
+            TryBuyArmy(GetArmyPrefab(newArmyType), armyRanks[(int)newArmyType]);
 
             if (randomizeArmyStats)
                 armies.Last().RandomizeStats();
@@ -64,7 +65,8 @@ public class AIPlayer : Player
         for (int i = 0; i < maxArmyCount; i++)
         {
             AddCash(Army.PurchaseCost(0));
-            TryBuyArmy(GetRandomArmyPrefab(), 0);
+            var newArmyType = GetRandomArmyType();
+            TryBuyArmy(GetArmyPrefab(newArmyType), armyRanks[(int)newArmyType]);
         }
     }
 
@@ -72,7 +74,7 @@ public class AIPlayer : Player
     {
         var newArmy = Instantiate(prefab, transform).GetComponent<Army>();
         newArmy.transform.position = GetSpawnPoint();
-        newArmy.SetRank(armyRank);
+        newArmy.SetRankAndHP(armyRank);
         newArmy.ChangeTeam(team);
         newArmy.SetVisible(false);
         armies.Add(newArmy);

@@ -70,15 +70,30 @@ public class Player : MonoBehaviour
         return cash;
     }
 
-    protected GameObject GetRandomArmyPrefab()
+    protected GameObject GetArmyPrefab(ArmyType type)
+    {
+        switch (type)
+        {
+            case ArmyType.Infantry:
+                return infantryPrefab;
+            case ArmyType.Cavalry:
+                return cavalryPrefab;
+            case ArmyType.Artillery:
+                return artilleryPrefab;
+            default:
+                throw new ArgumentException();
+        }
+    }
+
+    protected ArmyType GetRandomArmyType()
     {
         var r = UnityEngine.Random.Range(0, 3);
         if (r == 0)
-            return infantryPrefab;
+            return ArmyType.Infantry;
         else if (r == 1)
-            return cavalryPrefab;
+            return ArmyType.Cavalry;
         else
-            return artilleryPrefab;
+            return ArmyType.Artillery;
     }
 
     internal virtual bool TryBuyArmy(ArmyType armyType, Vector2 spawnPoint)
@@ -107,7 +122,7 @@ public class Player : MonoBehaviour
         {
             var newArmy = Instantiate(prefab, transform).GetComponent<Army>();
             newArmy.transform.position = spawnPoint;
-            newArmy.SetRank(armyRank);
+            newArmy.SetRankAndHP(armyRank);
             newArmy.ChangeTeam(team);
 
             if (cheater)

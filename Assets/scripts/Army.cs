@@ -197,9 +197,11 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
         return enemiesInRange.AsReadOnly();
     }
 
-    internal void SetRank(int aRank)
+    internal void SetRankAndHP(int aRank)
     {
         rank = aRank;
+        maxHP = GetItemAtRankOrLast(GetHPLevels());
+        hp = maxHP;
     }
 
     private void UpdateStats()
@@ -394,7 +396,7 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
         {
             RemoveUnreachableWaypoint();
         }
-        else if (collision.gameObject.GetComponent<Tile>() != null)
+        else if (collision.gameObject.tag == "Obstacle")
         {
             RemoveUnreachableWaypoint();
         }
