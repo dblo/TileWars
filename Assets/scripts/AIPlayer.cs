@@ -30,52 +30,21 @@ public class AIPlayer : Player
             logicCounter = 50;
             RespawnDeadArmies();
             MoveArmies();
-
-            TryUpgradeDifficulty(ArmyType.Infantry);
-            TryUpgradeDifficulty(ArmyType.Cavalry);
-            TryUpgradeDifficulty(ArmyType.Artillery);
         }
     }
 
-    private void TryUpgradeDifficulty(ArmyType type)
+    internal void UpgradeAllArmies()
     {
-        switch (armyRanks[(int)type])
-        {
-            case 0:
-                if (score >= 3000)
-                {
-                    TryUpgrade(type);
-                }
-                break;
-            case 1:
-                if (score >= 6000)
-                {
-                    TryUpgrade(type);
-                }
-                break;
-            case 2:
-                if (score >= 9000)
-                {
-                    TryUpgrade(type);
-                }
-                break;
-            default:
-                break;
-        }
+        TryUpgrade(ArmyType.Infantry);
+        TryUpgrade(ArmyType.Cavalry);
+        TryUpgrade(ArmyType.Artillery);
     }
 
     internal override bool TryUpgrade(ArmyType armyType)
     {
-        var armyRank = armyRanks[(int)armyType];
-        var upgradeCost = Army.UpgradeCost(armyRank);
-        if (upgradeCost <= cash)
-        {
-            UpgradeArmiesOfType(armyType);
-            cash -= upgradeCost;
-            armyRanks[(int)armyType]++;
-            return true;
-        }
-        return false;
+        UpgradeArmiesOfType(armyType);
+        armyRanks[(int)armyType]++;
+        return true;
     }
 
     private void RespawnDeadArmies()

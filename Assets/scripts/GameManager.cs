@@ -21,7 +21,8 @@ public class GameManager : MonoBehaviour
     private const float MOUSE_POLL_RATE = 0.1f;
     private const float MIN_SWIPE_TIME = 0.1f;
     private float swipeStartTime = -1;
-
+    private int difficultyLevel = 0;
+    private static int[] DIFFICULTY_SCORE_LEVELS = { 2500, 5000, 7500 };
     private Text p1CashText;
     private Text p1ScoreText;
     private Text p2ScoreText;
@@ -110,6 +111,7 @@ public class GameManager : MonoBehaviour
             UpdateStandingsTexts();
             CheckIfGameOverByScore();
             RegenArmies();
+            UpgradeDifficultyIfTime();
             nextEverySecondTime = Time.time + 1;
         }
         // TODO Do this only after spending or gaining cash
@@ -120,6 +122,16 @@ public class GameManager : MonoBehaviour
             UpdateVisibleArmies();
             UpdateFoW();
             nextVisibilityTime = Time.time + ARMY_UPDATE_INTERVAL;
+        }
+    }
+
+    private void UpgradeDifficultyIfTime()
+    {
+        if (difficultyLevel < DIFFICULTY_SCORE_LEVELS.Length && 
+            bluePlayer.GetScore() > DIFFICULTY_SCORE_LEVELS[difficultyLevel])
+        {
+            redPlayer.UpgradeAllArmies();
+            difficultyLevel++;
         }
     }
 
@@ -207,6 +219,11 @@ public class GameManager : MonoBehaviour
         var winnableToggle = GameObject.Find("WinnableToggle").GetComponent<Toggle>();
         winnable = winnableToggle.isOn;
         PlayerPrefs.SetInt("Winnable", Convert.ToInt32(winnable));
+    }
+
+    private void OnApplicationPause(bool pause)
+    {
+        gamePaused = pause;
     }
 
     private void SetGamePaused(bool paused)
