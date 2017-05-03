@@ -5,9 +5,9 @@ public class Cavalry : Army
 {
     private static List<int> attackDamageLevels = new List<int> { 10, 20, 30, 40 };
     private static List<int> defenseDamageLevels = new List<int> { 5, 10, 15, 20 };
-    private static List<int> hpLevels = new List<int> { 10, 20, 30, 40 };
-    private static List<float> speedLevels = new List<float> { 0.02f, 0.03f, 0.04f };
-    private static List<float> rangeLevels = new List<float> { 0.6f, 0.8f, 1f, 1.25f };
+    private static List<int> hpLevels = new List<int> { 30, 40, 50, 60 };
+    private static List<float> speedLevels = new List<float> { 0.015f, 0.02f, 0.025f, 0.03f };
+    private static List<float> rangeLevels = new List<float> { 0.5f, 0.6f, 0.7f, 0.8f };
 
     public override string GetUpgradeDescriptor()
     {
