@@ -13,7 +13,7 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
 {
     private static float REACHED_WAYPOINT_DISTANCE = .05f;
     protected static float HILL_RANGE_MULTIPLIER = 1.5f;
-    protected static float FAVORED_COMBAT_BONUS = 1.3f;
+    protected static float FAVORED_COMBAT_BONUS = 1.5f;
 
     [SerializeField]
     protected Team team;
@@ -234,7 +234,7 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
 
     protected virtual void UpdateDefense()
     {
-        defense = (int)(GetItemAtRankOrLast(GetDefenseLevels()) * tileCombatMods.DefenceMultiplier);
+        defense = Mathf.CeilToInt(GetItemAtRankOrLast(GetDefenseLevels()) * tileCombatMods.DefenceMultiplier);
     }
 
     protected virtual void UpdateMaxHP()

@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-public class Cavalry : Army {
-    private static List<int> attackDamageLevels = new List<int> { 5, 10, 15, 20 };
-    private static List<int> defenseDamageLevels = new List<int> { 1, 2, 3, 4 };
-    private static List<int> hpLevels = new List<int> { 8, 16, 24, 32 };
+public class Cavalry : Army
+{
+    private static List<int> attackDamageLevels = new List<int> { 10, 20, 30, 40 };
+    private static List<int> defenseDamageLevels = new List<int> { 5, 10, 15, 20 };
+    private static List<int> hpLevels = new List<int> { 10, 20, 30, 40 };
     private static List<float> speedLevels = new List<float> { 0.02f, 0.03f, 0.04f };
     private static List<float> rangeLevels = new List<float> { 0.6f, 0.8f, 1f, 1.25f };
 
