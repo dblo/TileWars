@@ -55,12 +55,12 @@ public static class TileModifiersFactory
 {
     private static List<float> sPlainRangeModifiers = new List<float> { 1, 1, 1, 1 };
     private static List<float> sPlainsDefenseModifiers = new List<float> { 1, 1.2f, 1.4f, 1.6f };
-    private static List<int> sPlainsCashValues = new List<int> { 0 };
+    private static List<int> sPlainsCashValues = new List<int> { 0, 0, 0, 0 };
     private static List<int> sPlainsScoreValues = new List<int> { 1, 1, 1, 1 };
 
     private static List<float> sHillRangeModifiers = new List<float> { 1.25f, 1.5f, 1.75f, 2f };
     private static List<float> sHillDefenseModifiers = new List<float> { 1.25f, 1.5f, 1.75f, 2 };
-    private static List<int> sHillCashValues = new List<int> { 0 };
+    private static List<int> sHillCashValues = new List<int> { 0, 0, 0, 0 };
     private static List<int> sHillScoreValues = new List<int> { 2, 3, 4, 5 };
 
     private static List<float> sMineRangeModifiers = new List<float> { 0.6f, 0.8f, 1, 1.2f };
