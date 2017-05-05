@@ -20,10 +20,10 @@ public class Artillery : Army
     //private const float SHELL_LIFETIME = 0.7f;
     private const float DEPLOY_TIME = 3f;
 
-    private static List<int> attackDamageLevels = new List<int> { 10, 20, 30, 40 };
-    private static List<int> defenseDamageLevels = new List<int> { 1, 2, 3, 4 };
-    private static List<int> hpLevels = new List<int> { 20, 30, 40, 50 };
-    private static List<float> speedLevels = new List<float> { 0.007f, 0.009f, 0.0011f, 0.013f };
+    private static List<int> attackDamageLevels = new List<int> { 6, 8, 10, 12 };
+    private static List<int> defenseDamageLevels = new List<int> { 0,0,0,0 };
+    private static List<int> hpLevels = new List<int> { 30, 40, 50, 60 };
+    private static List<float> speedLevels = new List<float> { 0.007f, 0.009f, 0.011f, 0.013f };
     private static List<float> rangeLevels = new List<float> { 1f, 1.25f, 1.5f, 2f };
 
     DeployStatus deployStatus = DeployStatus.NOT_STARTED;
@@ -165,7 +165,7 @@ public class Artillery : Army
     protected override float GetAttackMultiplier(Army enemy)
     {
         if (enemy is Infantry)
-            return 1.3f;
+            return 2f;
         return 1;
     }
 }

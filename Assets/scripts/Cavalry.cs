@@ -3,11 +3,11 @@ using System.Collections.ObjectModel;
 
 public class Cavalry : Army
 {
-    private static List<int> attackDamageLevels = new List<int> { 10, 20, 30, 40 };
-    private static List<int> defenseDamageLevels = new List<int> { 5, 10, 15, 20 };
+    private static List<int> attackDamageLevels = new List<int> { 8,10,12,14 };
+    private static List<int> defenseDamageLevels = new List<int> { 0,0,0,0 };
     private static List<int> hpLevels = new List<int> { 30, 40, 50, 60 };
     private static List<float> speedLevels = new List<float> { 0.015f, 0.02f, 0.025f, 0.03f };
-    private static List<float> rangeLevels = new List<float> { 0.5f, 0.6f, 0.7f, 0.8f };
+    private static List<float> rangeLevels = new List<float> { 0.5f, 0.55f, 0.6f, 0.65f };
 
     public override string GetUpgradeDescriptor()
     {
@@ -49,7 +49,7 @@ public class Cavalry : Army
     protected override float GetAttackMultiplier(Army enemy)
     {
         if (enemy is Artillery)
-            return 1.3f;
+            return 2;
         return 1;
     }
 }

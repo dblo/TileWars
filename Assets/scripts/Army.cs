@@ -234,7 +234,7 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
 
     protected virtual void UpdateDefense()
     {
-        defense = Mathf.CeilToInt(GetItemAtRankOrLast(GetDefenseLevels()) * tileCombatMods.DefenceMultiplier);
+        defense = Mathf.CeilToInt(GetItemAtRankOrLast(GetDefenseLevels()));
     }
 
     protected virtual void UpdateMaxHP()
@@ -346,7 +346,7 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
             return;
 
         var enemy = enemiesInRange[0];
-        var damage = attackDamage * GetAttackMultiplier(enemy);
+        var damage = attackDamage * GetAttackMultiplier(enemy) * enemy.tileCombatMods.DefenceMultiplier;
         enemy.TakeDamage((int)Mathf.Ceil(damage));
     }
 
