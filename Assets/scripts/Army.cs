@@ -44,7 +44,6 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
     protected ITileCombatModifiers tileCombatMods;
     private const int MIN_DAMAGE_TAKEN = 1;
     private int maxHP;
-    private int regen = 1;
     #endregion
 
     #region Getters/Setters/Predicates
@@ -180,10 +179,12 @@ public abstract class Army : MonoBehaviour, ISelectableObject, ITileObserver
 
     internal void Regen()
     {
-        if (hp >= maxHP) return;
-        hp = Mathf.Clamp(hp + regen, hp, maxHP);
-        UpdatePower();
-
+        if (hp < maxHP)
+        {
+            int regen = Mathf.CeilToInt((maxHP - hp) / 10);
+            hp = Mathf.Clamp(hp + regen, hp, maxHP);
+            UpdatePower();
+        }
     }
 
     internal void Upgrade()

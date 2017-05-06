@@ -11,7 +11,6 @@ public class GameManager : MonoBehaviour
     private ISelectableObject selectedObject;
     private float nextEverySecondTime = 0;
     private float nextVisibilityTime = 0;
-    private const float COMBAT_LOGIC_INTERVAL = 1f;
     [SerializeField]
     private Player bluePlayer;
     [SerializeField]
